@@ -1,0 +1,14 @@
+{
+  "name": "agent-team",
+  "displayName": "Claude Code Agent Team",
+  "version": "2.0.0",
+  "description": "The Quartet: eight subagents pinned to the right Claude model. Fable 5.1 plans and audits, Opus 5.5 builds, Sonnet 5.5 works, reviews, researches and edits, Haiku 5.5 explores.",
+  "author": {
+    "name": "Dexter Ng",
+    "url": "https://github.com/dextee"
+  },
+  "homepage": "https://github.com/dextee/claude-agent-team-guide",
+  "repository": "https://github.com/dextee/claude-agent-team-guide",
+  "license": "MIT",
+  "keywords": ["subagents", "agent-team", "model-routing", "fable", "opus", "sonnet", "haiku"]
+}

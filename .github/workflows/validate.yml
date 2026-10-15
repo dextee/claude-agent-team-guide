@@ -1,0 +1,26 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate links, images, agents and arithmetic
+        run: python3 scripts/validate.py
+      - name: Validator regression tests
+        run: python3 scripts/test_validate.py
+      - name: Installer tests
+        run: python3 scripts/test_installer.py
+      - name: Installer syntax
+        run: bash -n install.sh

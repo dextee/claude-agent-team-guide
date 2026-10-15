@@ -1,0 +1,16 @@
+name: Workflow or agent idea
+description: Suggest a new workflow recipe, task row or agent definition
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The workflow
+      description: What task is it for, which model and effort does each agent use, and why? What proves it is done?
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: What happened when you tried it
+      description: Cost, speed, quality or failure notes help. Leave out private code and customer data.

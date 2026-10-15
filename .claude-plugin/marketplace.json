@@ -1,0 +1,15 @@
+{
+  "name": "dextee-guides",
+  "description": "Agent team setups from the Agent Team Guide series by Dexter Ng.",
+  "owner": {
+    "name": "Dexter Ng",
+    "url": "https://github.com/dextee"
+  },
+  "plugins": [
+    {
+      "name": "agent-team",
+      "source": "./",
+      "description": "Eight subagents pinned to the right Claude model: Fable 5.1 plans and audits, Opus 5.5 builds, Sonnet 5.5 works, reviews, researches and edits, Haiku 5.5 explores."
+    }
+  ]
+}

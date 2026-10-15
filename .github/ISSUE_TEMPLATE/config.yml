@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Business enquiries (VYR)
+    url: https://vyrwork.com/contact?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=issue_template
+    about: For workflow scoping and implementation, contact VYR directly.

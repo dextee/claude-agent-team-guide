@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you reference this guide, please cite it as below."
+type: software
+title: "Claude Code Agent Team Guide"
+abstract: "A field guide to choosing Claude Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 for each job, with eight installable Claude Code subagents that pin a model and effort level to every role."
+authors:
+  - given-names: Dexter
+    family-names: Ng
+    alias: dextee
+    affiliation: VYR
+repository-code: "https://github.com/dextee/claude-agent-team-guide"
+url: "https://github.com/dextee/claude-agent-team-guide"
+license: MIT
+version: 2.0.0
+date-released: 2026-10-15
+keywords:
+  - claude-code
+  - claude
+  - subagents
+  - ai-agents
+  - multi-agent
+  - model-selection
+  - llm

@@ -1,0 +1,723 @@
+{
+  "title": "The Agent Workflow Atlas",
+  "verified_on": "2026-09-27",
+  "status_rechecked_on": "2026-10-15",
+  "source": "https://vyrwork.com/agent-os",
+  "editorial_note": "Source statuses describe VYR's public claims checked on this date. Agent names, handoff contracts, worked examples and evaluation ideas are proposed educational designs, not audited deployed internals or measured results. Each example uses fictional data. The shared memory layer on the source site is build-to-order and is not wired into its three live pipelines.",
+  "workflows": [
+    {
+      "id": "ai-receptionist",
+      "route": "spa-demo",
+      "title": "AI Receptionist",
+      "status": "DEMO",
+      "status_detail": "Working voice software using sample business data; no live booking connection.",
+      "goal": "Turn an inbound call into a correct sample booking or a useful staff handoff.",
+      "trigger": "A caller asks for a Saturday appointment in their preferred language.",
+      "roles": [
+        [
+          "Concierge agent",
+          "Call + supported-language list",
+          "Intent, language and minimum contact details"
+        ],
+        [
+          "Knowledge agent",
+          "Intent + approved sample FAQs",
+          "Supported answer with a source reference"
+        ],
+        [
+          "Availability agent",
+          "Service + requested time",
+          "Valid options from the sample calendar"
+        ],
+        [
+          "Booking agent",
+          "Selected sample slot + caller confirmation",
+          "Sample booking record and read-back"
+        ],
+        [
+          "Handoff agent",
+          "Unsupported request + conversation summary",
+          "Reason, unresolved question and staff queue item"
+        ]
+      ],
+      "collaboration": "The concierge dispatches a factual enquiry to knowledge and a booking enquiry to availability. It joins their findings before asking the caller to choose. Sensitive or unsupported requests branch directly to a person.",
+      "gate": "Staff own sensitive requests, policy exceptions and unsupported questions.",
+      "boundary": "Every booking is a simulation. Do not represent a sample slot as a real appointment.",
+      "outcome": "Sample booking plus read-back, or a staff-ready handoff.",
+      "example": "Fictional run: a caller requests a 60-minute appointment on Saturday. Availability returns 14:00 and 16:00 from the demo calendar. The caller chooses 16:00; the booking agent repeats the date and time and records a sample booking. A refund question is transferred with its context.",
+      "measure": "Evaluate slot accuracy, handoff completeness, language handling and response latency against scripted calls.",
+      "short_roles": [
+        "Concierge",
+        "Knowledge",
+        "Availability",
+        "Booking",
+        "Handoff"
+      ],
+      "number": "01",
+      "source": "https://vyrwork.com/agent-os/spa-demo"
+    },
+    {
+      "id": "content-operations",
+      "route": "seo-flow",
+      "title": "Content Operations",
+      "status": "LIVE",
+      "status_detail": "Live eleven-agent pipeline; new generation is currently paused behind an approval backlog.",
+      "goal": "Prepare a sourced article and release only the version an editor approves.",
+      "trigger": "An approved topic becomes eligible in the keyword calendar.",
+      "roles": [
+        [
+          "Planner agent",
+          "Keyword + audience + page inventory",
+          "Brief and search-intent overlap decision"
+        ],
+        [
+          "Research agent",
+          "Cleared brief + public sources",
+          "Evidence packet and outline"
+        ],
+        [
+          "Writer agent",
+          "Outline + evidence + house style",
+          "Draft with traceable claims"
+        ],
+        [
+          "Review agent",
+          "Draft + page inventory",
+          "Metadata, link and claim findings"
+        ],
+        [
+          "Release agent",
+          "Exact approved article + reviewer decision",
+          "Published route and verification receipt"
+        ]
+      ],
+      "collaboration": "Planner checks overlap before commissioning research. Writer consumes the evidence packet; reviewer returns specific revision requests to writer. Only the editor can move an accepted version to release. These five role groups explain the public seven-stage control path; they are not the exact eleven-agent roster.",
+      "gate": "A named editor approves, rejects or requests changes before publication.",
+      "boundary": "Backlog pause remains visible; a prepared draft is not a live page or a ranking result.",
+      "outcome": "Approved article, verified route and recorded review decision.",
+      "example": "Fictional run: the planner finds that a proposed article overlaps an existing page and holds the draft. After the editor selects a distinct intent, research and writing proceed; a missing source sends the draft back to research before approval.",
+      "measure": "Track revision causes, unsupported-claim rate, duplicate-intent holds and successful live-route verification.",
+      "short_roles": [
+        "Planner",
+        "Research",
+        "Writer",
+        "Review",
+        "Release"
+      ],
+      "number": "02",
+      "source": "https://vyrwork.com/agent-os/seo-flow"
+    },
+    {
+      "id": "lead-generation",
+      "route": "leadgen-flow",
+      "title": "Lead Generation",
+      "status": "LIVE",
+      "status_detail": "Public-source prospect research, enrichment, deduplication and mailbox checks; outreach is excluded.",
+      "goal": "Deliver a sourced prospect list that a sales owner can review.",
+      "trigger": "Sales supplies an ideal-customer profile and exclusion list.",
+      "roles": [
+        [
+          "Brief agent",
+          "Approved ICP + exclusions",
+          "Search criteria and required evidence"
+        ],
+        [
+          "Research agent",
+          "Criteria + public business sources",
+          "Candidate companies with source URLs"
+        ],
+        [
+          "Enrichment agent",
+          "Candidates + prior-record inventory",
+          "Business context and duplicate decisions"
+        ],
+        [
+          "Verification agent",
+          "Candidate contact fields",
+          "Mailbox-check status with uncertainty"
+        ],
+        [
+          "Delivery agent",
+          "Sales-reviewed records",
+          "Scored CSV and source context"
+        ]
+      ],
+      "collaboration": "Research passes candidate records to enrichment. Verification annotates surviving records rather than replacing their evidence. Sales reviews fit and exclusions before delivery exports the list.",
+      "gate": "Sales owns suitability, list use and every subsequent outreach decision.",
+      "boundary": "Mailbox verification does not prove consent, buyer interest or guaranteed delivery. No messages are sent.",
+      "outcome": "Reviewable CSV with evidence, verification state and exclusions.",
+      "example": "Fictional run: a Singapore wholesale brief yields candidate companies. An already-delivered company is removed. One uncertain mailbox stays flagged for review; it is never relabelled as a willing buyer. The accepted list is exported without sending outreach.",
+      "measure": "Measure duplicate rate, source coverage, review acceptance and contact-check freshness.",
+      "short_roles": [
+        "Brief",
+        "Research",
+        "Enrichment",
+        "Verification",
+        "Delivery"
+      ],
+      "number": "03",
+      "source": "https://vyrwork.com/agent-os/leadgen-flow"
+    },
+    {
+      "id": "social-command-center",
+      "route": "social-media-flow",
+      "title": "Social Command Center",
+      "status": "LIVE",
+      "status_detail": "Live FeedHive telemetry is read-only; new writes use a separate approval-bound publisher.",
+      "goal": "Turn approved content into a controlled release and observe its actual delivery.",
+      "trigger": "A source item has permission for social repurposing.",
+      "roles": [
+        [
+          "Source agent",
+          "Approved owned content",
+          "Source packet and usage context"
+        ],
+        [
+          "Channel writer",
+          "Source packet + platform rules",
+          "Channel-specific copy and image proposal"
+        ],
+        [
+          "Brand reviewer",
+          "Proposed content + brand rules",
+          "Supported claims and release manifest"
+        ],
+        [
+          "Publisher service",
+          "Named-human approval + exact manifest",
+          "Revalidated FeedHive write and receipt"
+        ],
+        [
+          "Observer agent",
+          "Read-only FeedHive snapshots",
+          "Delivery state, audience and measurement report"
+        ]
+      ],
+      "collaboration": "Drafting and review prepare the release packet. A person approves the exact copy, image, accounts, labels and schedule. A separate publisher validates that binding; the observer only reads resulting telemetry.",
+      "gate": "Named-human approval binds the exact release manifest. Any changed field invalidates release.",
+      "boundary": "The command center itself cannot create, approve, edit, schedule or delete posts.",
+      "outcome": "Approved release receipt and a separate read-only delivery report.",
+      "example": "Fictional run: a reviewer approves Tuesday copy for one account. A later image swap makes the binding invalid, so the publisher holds. After a fresh approval, a release can proceed; the observer reports the returned delivery state without mutating it.",
+      "measure": "Test changed-manifest rejection, wrong-account rejection and receipt-to-telemetry reconciliation.",
+      "short_roles": [
+        "Source",
+        "Channel writer",
+        "Brand review",
+        "Publisher",
+        "Observer"
+      ],
+      "number": "04",
+      "source": "https://vyrwork.com/agent-os/social-media-flow"
+    },
+    {
+      "id": "clinics",
+      "route": "clinic-flow",
+      "title": "Clinic Front Desk",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order administrative workflow; no deployed clinic result is claimed.",
+      "goal": "Resolve appointment administration while keeping clinical questions with clinic staff.",
+      "trigger": "A patient sends an appointment or rescheduling request.",
+      "roles": [
+        [
+          "Intake agent",
+          "Approved channel + booking request",
+          "Administrative intent and supplied constraints"
+        ],
+        [
+          "Schedule agent",
+          "Practitioner schedule + constraints",
+          "Available appointment options"
+        ],
+        [
+          "Confirmation agent",
+          "Chosen option + administrative policy",
+          "Booking or reminder proposal"
+        ],
+        [
+          "Exception agent",
+          "Clinical, identity or sensitive-record issue",
+          "Authorised-staff handoff"
+        ],
+        [
+          "Record agent",
+          "Confirmed administrative decision",
+          "Booking state, reminder and audit entry"
+        ]
+      ],
+      "collaboration": "Intake routes administrative requests to schedule. Confirmation returns details for acceptance; exception checks can interrupt the path at any point. Record consumes only the permitted administrative outcome.",
+      "gate": "Clinic staff own clinical judgment, identity decisions, sensitive records and exceptional release.",
+      "boundary": "No diagnosis, symptom triage or clinical advice. Booking-system compatibility requires assessment.",
+      "outcome": "Correct administrative record or a contextual staff handoff.",
+      "example": "Fictional run: a patient asks to move an appointment to Friday. A matching slot is proposed. When the patient also asks whether new symptoms require treatment, the agent passes that question to staff instead of interpreting it.",
+      "measure": "Evaluate schedule consistency, clinical-question routing, identity holds and record-write receipts.",
+      "short_roles": [
+        "Intake",
+        "Schedule",
+        "Confirmation",
+        "Exception",
+        "Record"
+      ],
+      "number": "05",
+      "source": "https://vyrwork.com/agent-os/clinic-flow"
+    },
+    {
+      "id": "invoice-processing",
+      "route": "invoice-flow",
+      "title": "Invoice Processing",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order invoice review and Xero draft integration; payment authority stays with finance.",
+      "goal": "Convert an invoice into a reviewed accounting draft with explainable exceptions.",
+      "trigger": "A supplier invoice arrives as an approved attachment or scan.",
+      "roles": [
+        [
+          "Capture agent",
+          "Invoice + original source",
+          "Source-preserved document record"
+        ],
+        [
+          "Extraction agent",
+          "Document record",
+          "Supplier, amount, tax and line-item fields"
+        ],
+        [
+          "Matching agent",
+          "Extracted fields + PO + receipt",
+          "Variance and possible-duplicate report"
+        ],
+        [
+          "Exception agent",
+          "Mismatches + finance rules",
+          "Finance review packet"
+        ],
+        [
+          "Ledger agent",
+          "Finance-approved coding",
+          "Draft Xero entry and integration receipt"
+        ]
+      ],
+      "collaboration": "Extraction attaches each field to its source. Matching compares independent records. Exceptions travel with the conflicting values, so finance can resolve them before the ledger agent prepares an approved draft.",
+      "gate": "Finance resolves mismatches and retains accounting decisions and payment authority.",
+      "boundary": "No bank access or automatic payment. Extraction confidence does not establish invoice validity.",
+      "outcome": "Reviewed ledger draft with source and exception history.",
+      "example": "Fictional run: an invoice lists 12 units but the receipt records 10. Matching passes both figures to finance. The draft remains held until the discrepancy is resolved; approval creates an accounting draft, never a bank transfer.",
+      "measure": "Test duplicate handling, arithmetic reconciliation, field-source traceability and exception routing.",
+      "short_roles": [
+        "Capture",
+        "Extraction",
+        "Matching",
+        "Exception",
+        "Ledger"
+      ],
+      "number": "06",
+      "source": "https://vyrwork.com/agent-os/invoice-flow"
+    },
+    {
+      "id": "customer-support",
+      "route": "support-flow",
+      "title": "Customer Support",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order support triage, grounded replies and controlled release.",
+      "goal": "Get each enquiry to a supported answer or the right person with full context.",
+      "trigger": "An email, chat or WhatsApp enquiry reaches an approved inbox.",
+      "roles": [
+        [
+          "Intake agent",
+          "Message + permitted account context",
+          "Case record and prior-thread summary"
+        ],
+        [
+          "Triage agent",
+          "Case + priority rules",
+          "Intent, urgency and queue owner"
+        ],
+        [
+          "Knowledge agent",
+          "Question + approved documentation",
+          "Relevant evidence and missing-information flags"
+        ],
+        [
+          "Reply agent",
+          "Evidence + response policy",
+          "Grounded draft with cited source"
+        ],
+        [
+          "Case agent",
+          "Release decision or escalation",
+          "Sent-message receipt or staff-owned case"
+        ]
+      ],
+      "collaboration": "Triage chooses an owner while knowledge retrieves the relevant source. Reply joins those outputs. Missing evidence, complaints, refunds and policy exceptions go to staff before release.",
+      "gate": "Support staff own sensitive cases and outbound actions requiring human release.",
+      "boundary": "No invented policy answers, automatic compensation or bypass of identity checks.",
+      "outcome": "Evidence-backed reply or a useful escalation, with the case state updated.",
+      "example": "Fictional run: a delivery question has a clear documented answer, so a draft is prepared. A refund request in the same thread changes the path: staff receive the policy source and customer context before any promise is made.",
+      "measure": "Evaluate grounded-answer accuracy, escalation recall, identity checks and case-state consistency.",
+      "short_roles": [
+        "Intake",
+        "Triage",
+        "Knowledge",
+        "Reply",
+        "Case"
+      ],
+      "number": "07",
+      "source": "https://vyrwork.com/agent-os/support-flow"
+    },
+    {
+      "id": "hr-operations",
+      "route": "hr-flow",
+      "title": "HR Operations",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order onboarding and policy routing; Talenox or Payboy integration is scoped and tested.",
+      "goal": "Make a new starter's onboarding complete, attributable and reviewable.",
+      "trigger": "HR approves a role, start date and onboarding owner.",
+      "roles": [
+        [
+          "Case agent",
+          "Approved starter brief",
+          "Role-specific onboarding checklist"
+        ],
+        [
+          "Document agent",
+          "Checklist + submitted documents",
+          "Required-document status and gaps"
+        ],
+        [
+          "Task coordinator",
+          "Checklist + named owners",
+          "Equipment, access and manager tasks"
+        ],
+        [
+          "Policy agent",
+          "Employee question + approved policies",
+          "Supported answer draft or HR referral"
+        ],
+        [
+          "Completion agent",
+          "Owner confirmations + HR decisions",
+          "Verified onboarding state"
+        ]
+      ],
+      "collaboration": "The case agent fans work out to documents, task coordination and policy support. Completion joins their evidence; assigned tasks do not count as completed tasks.",
+      "gate": "HR resolves missing evidence and sensitive exceptions, and retains all employment decisions.",
+      "boundary": "No autonomous salary, payroll, performance, discipline or termination decisions.",
+      "outcome": "Completed checklist with owner confirmations, or an explicit outstanding-items list.",
+      "example": "Fictional run: a new starter has supplied the required documents, but IT has not confirmed access. Completion leaves onboarding open and identifies IT as the owner. An unusual employment-term question goes to HR.",
+      "measure": "Track overdue ownership, falsely completed tasks, document-access boundaries and policy-source coverage.",
+      "short_roles": [
+        "Case",
+        "Documents",
+        "Tasks",
+        "Policy",
+        "Completion"
+      ],
+      "number": "08",
+      "source": "https://vyrwork.com/agent-os/hr-flow"
+    },
+    {
+      "id": "recruitment-screening",
+      "route": "recruitment-flow",
+      "title": "Recruitment Screening",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order evidence triage; recruiters own progression, interview and rejection decisions.",
+      "goal": "Prepare a transparent application review and coordinate recruiter-approved interviews.",
+      "trigger": "A candidate submits an application against written role criteria.",
+      "roles": [
+        [
+          "Intake agent",
+          "Submitted application + approved criteria",
+          "Application record and permitted assessment fields"
+        ],
+        [
+          "Evidence agent",
+          "Application record",
+          "Criterion-by-criterion evidence map"
+        ],
+        [
+          "Triage agent",
+          "Evidence map",
+          "Review summary, uncertainty and near-match flags"
+        ],
+        [
+          "Review coordinator",
+          "Summary + original evidence",
+          "Recruiter decision packet"
+        ],
+        [
+          "Scheduling agent",
+          "Explicit interview approval + calendars",
+          "Agreed interview and coordination record"
+        ]
+      ],
+      "collaboration": "Evidence mapping preserves what the applicant actually provided. Triage describes gaps rather than inventing qualifications. The recruiter decides; scheduling receives only approved next steps.",
+      "gate": "A recruiter or hiring manager owns every shortlist, interview, rejection and override.",
+      "boundary": "Do not infer protected characteristics or make autonomous employment decisions.",
+      "outcome": "Reviewable evidence map and a human-owned next step.",
+      "example": "Fictional run: an applicant demonstrates the core skill but lists no relevant certification. The evidence map labels that criterion 'not supplied'. The recruiter decides whether to request clarification or approve an interview.",
+      "measure": "Audit evidence traceability, missing-data treatment, reviewer overrides and unauthorised-decision attempts.",
+      "short_roles": [
+        "Intake",
+        "Evidence",
+        "Triage",
+        "Review packet",
+        "Scheduling"
+      ],
+      "number": "09",
+      "source": "https://vyrwork.com/agent-os/recruitment-flow"
+    },
+    {
+      "id": "food-and-beverage",
+      "route": "fnb-flow",
+      "title": "F&B Supplier Reorder",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order operations blueprint; this case focuses on the detailed supplier-reorder path.",
+      "goal": "Prepare the right stock replenishment for a manager's decision.",
+      "trigger": "An approved inventory or shift-handover signal crosses a reorder threshold.",
+      "roles": [
+        [
+          "Stock agent",
+          "Inventory + usage signal",
+          "Current stock observation and timestamp"
+        ],
+        [
+          "Rules agent",
+          "Observation + thresholds + open orders",
+          "Reorder need or already-covered decision"
+        ],
+        [
+          "Supplier agent",
+          "Needed items + approved supplier register",
+          "Quantity and supplier proposal"
+        ],
+        [
+          "Order agent",
+          "Proposal + evidence",
+          "Draft purchase order and exceptions"
+        ],
+        [
+          "Receipt agent",
+          "Manager-approved release",
+          "Order receipt and expected-delivery record"
+        ]
+      ],
+      "collaboration": "Rules checks both inventory and open orders before supplier planning. The order draft carries assumptions into manager review. Receipt records the authorised release; it does not infer delivery.",
+      "gate": "The manager owns supplier, quantity, substitution, price, spending and release.",
+      "boundary": "No unapproved spend or invented substitutions. Delivery remains unconfirmed until evidence arrives.",
+      "outcome": "Manager-approved order with traceable stock rationale.",
+      "example": "Fictional run: an ingredient appears below threshold, but an open order already covers tomorrow's need. Rules suppresses a duplicate reorder. A different item needs replenishment and proceeds as a manager-review draft.",
+      "measure": "Evaluate duplicate-order prevention, stock freshness, approval binding and order-receipt accuracy.",
+      "short_roles": [
+        "Stock",
+        "Rules",
+        "Supplier",
+        "Order",
+        "Receipt"
+      ],
+      "number": "10",
+      "source": "https://vyrwork.com/agent-os/fnb-flow"
+    },
+    {
+      "id": "tuition-centres",
+      "route": "tuition-flow",
+      "title": "Tuition Trial Booking",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order enquiry and trial-class booking workflow; placement stays with centre staff.",
+      "goal": "Match a parent's enquiry to a genuinely available trial class.",
+      "trigger": "A parent specifies subject, level, location and preferred time.",
+      "roles": [
+        [
+          "Enquiry agent",
+          "Parent-supplied constraints",
+          "Structured trial request"
+        ],
+        [
+          "Schedule agent",
+          "Timetable + capacity + trial rules",
+          "Available classes meeting the constraints"
+        ],
+        [
+          "Options agent",
+          "Valid classes",
+          "Clear options for parent acceptance"
+        ],
+        [
+          "Staff handoff agent",
+          "Placement or child-specific question",
+          "Contextual centre-staff referral"
+        ],
+        [
+          "Booking agent",
+          "Accepted slot + applicable approval",
+          "Trial record and permitted follow-up"
+        ]
+      ],
+      "collaboration": "Schedule supplies actual capacity to options. The parent chooses a valid slot. Placement or special-arrangement questions branch to staff; booking records only the accepted, permitted outcome.",
+      "gate": "Centre staff own placement, assessments, special arrangements, fee exceptions and progress discussions.",
+      "boundary": "No assessment of a child's ability or invented class capacity.",
+      "outcome": "Accepted trial booking or a staff-owned placement question.",
+      "example": "Fictional run: a parent wants a weekday maths trial near home. Two valid classes are offered. A request to move the child to a higher level pauses that decision for centre staff before the booking is finalised.",
+      "measure": "Test capacity accuracy, acceptance capture, child-specific escalation and follow-up permissions.",
+      "short_roles": [
+        "Enquiry",
+        "Schedule",
+        "Options",
+        "Staff handoff",
+        "Booking"
+      ],
+      "number": "11",
+      "source": "https://vyrwork.com/agent-os/tuition-flow"
+    },
+    {
+      "id": "lead-nurture",
+      "route": "nurture-flow",
+      "title": "Lead Nurture",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order HubSpot follow-up workflow; there is no claimed live client deployment.",
+      "goal": "Prepare a relevant next contact for the deal owner's approval.",
+      "trigger": "A scoped HubSpot deal meets an agreed inactivity rule.",
+      "roles": [
+        [
+          "Monitor agent",
+          "Deal stage + inactivity rule",
+          "Eligible follow-up case"
+        ],
+        [
+          "Context agent",
+          "Permitted CRM notes + prior contact",
+          "Relationship summary and missing-context flags"
+        ],
+        [
+          "Drafting agent",
+          "Context + message policy",
+          "Suggested next touch and rationale"
+        ],
+        [
+          "Review coordinator",
+          "Draft + recipient + timing",
+          "Deal-owner approval packet"
+        ],
+        [
+          "Activity agent",
+          "Approved exact message",
+          "Send receipt and scoped CRM update"
+        ]
+      ],
+      "collaboration": "Monitor selects eligible cases; context checks the actual history before drafting. The owner edits or rejects the proposal. Activity runs only after the approved release condition is satisfied.",
+      "gate": "The sales owner controls recipient, copy, timing and send.",
+      "boundary": "A CRM record alone is not contact permission. Do not fabricate relationship history.",
+      "outcome": "Approved follow-up with an activity record, or an explicit hold.",
+      "example": "Fictional run: a proposal has been inactive for a week. Context finds a note that the buyer is away; the draft proposes waiting. The owner sets an appropriate date, and only the approved message becomes a send task.",
+      "measure": "Evaluate context accuracy, permission checks, changed-draft holds and CRM reconciliation.",
+      "short_roles": [
+        "Monitor",
+        "Context",
+        "Drafting",
+        "Review packet",
+        "Activity"
+      ],
+      "number": "12",
+      "source": "https://vyrwork.com/agent-os/nurture-flow"
+    },
+    {
+      "id": "compliance-evidence",
+      "route": "compliance-flow",
+      "title": "Compliance Evidence",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order evidence preparation; it does not certify compliance or control effectiveness.",
+      "goal": "Give a reviewer a traceable evidence pack and an honest gap register.",
+      "trigger": "A scheduled review opens for an approved control set.",
+      "roles": [
+        [
+          "Collection agent",
+          "In-scope events + documents",
+          "Evidence records with source and timestamp"
+        ],
+        [
+          "Mapping agent",
+          "Evidence + control register",
+          "Proposed evidence-to-control links"
+        ],
+        [
+          "Gap agent",
+          "Mappings + evidence requirements",
+          "Missing, stale or conflicting items"
+        ],
+        [
+          "Review coordinator",
+          "Evidence + gaps + owners",
+          "Accountable-review packet"
+        ],
+        [
+          "Pack agent",
+          "Recorded reviewer conclusions",
+          "Indexed evidence pack with unresolved gaps"
+        ]
+      ],
+      "collaboration": "Collection preserves provenance. Mapping proposes links; gap review challenges sufficiency. A person assesses meaning before the pack agent assembles the reviewed record.",
+      "gate": "The control owner, compliance lead or auditor decides sufficiency and conclusions.",
+      "boundary": "No automated certification. An absent alert is not proof that a control works.",
+      "outcome": "Reviewed evidence index with owners, dates and visible open gaps.",
+      "example": "Fictional run: a control has an old policy but no current execution record. Gap review marks the evidence incomplete. The reviewer assigns an owner and due date; the pack keeps the gap visible instead of displaying a pass badge.",
+      "measure": "Test provenance completeness, stale-record detection, conflicting-evidence handling and reviewer attribution.",
+      "short_roles": [
+        "Collection",
+        "Mapping",
+        "Gap review",
+        "Review packet",
+        "Pack"
+      ],
+      "number": "13",
+      "source": "https://vyrwork.com/agent-os/compliance-flow"
+    },
+    {
+      "id": "beauty-and-wellness",
+      "route": "beauty-flow",
+      "title": "Beauty & Wellness",
+      "status": "BUILT FOR YOU",
+      "status_detail": "Build-to-order salon booking and package-reference workflow; no running salon deployment is claimed.",
+      "goal": "Coordinate service, therapist, room and package information into a valid booking.",
+      "trigger": "A customer requests a service at a preferred time and location.",
+      "roles": [
+        [
+          "Concierge agent",
+          "Service + preferences",
+          "Booking constraints and minimum details"
+        ],
+        [
+          "Roster agent",
+          "Therapist + room + duration calendar",
+          "Feasible appointment slots"
+        ],
+        [
+          "Package agent",
+          "Permitted customer package record",
+          "Balance reference and applicable session rules"
+        ],
+        [
+          "Booking agent",
+          "Valid slot + package context + acceptance",
+          "Approved appointment proposal"
+        ],
+        [
+          "Follow-up agent",
+          "Confirmed booking + reminder policy",
+          "Permitted reminder or rebooking task"
+        ]
+      ],
+      "collaboration": "Concierge requests roster and package checks in parallel. Booking joins their results without inventing entitlement. Staff resolve treatment, pricing or package exceptions before the permitted outcome is recorded.",
+      "gate": "Staff own suitability, refunds, price changes, package disputes and exceptional bookings.",
+      "boundary": "Package lookup is not refund authority. No treatment advice or unsupported availability.",
+      "outcome": "Valid appointment and permitted follow-up, or a staff-owned exception.",
+      "example": "Fictional run: a requested therapist is free but the required room is occupied. Roster offers a later slot. If the package record is disputed, staff resolve it before any package-based booking promise.",
+      "measure": "Evaluate multi-resource conflicts, package-reference accuracy, staff routing and confirmation consistency.",
+      "short_roles": [
+        "Concierge",
+        "Roster",
+        "Package",
+        "Booking",
+        "Follow-up"
+      ],
+      "number": "14",
+      "source": "https://vyrwork.com/agent-os/beauty-flow"
+    }
+  ]
+}

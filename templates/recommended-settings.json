@@ -1,0 +1,6 @@
+{
+  "$comment": "Optional preset merged by install.sh --with-settings. Subagents and teammates without their own model default to Sonnet 5.5. The eight agents in this guide pin their own models, so this only affects other agents.",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5"
+  }
+}

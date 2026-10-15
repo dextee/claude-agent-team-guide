@@ -1,0 +1,32 @@
+name: Outdated information
+description: A model, price, effort setting, CLI flag or agent field in the guide has changed
+labels: ["outdated"]
+body:
+  - type: input
+    id: section
+    attributes:
+      label: File and section
+      description: Which file and section is out of date?
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What changed
+      description: What does the guide say, and what is correct now?
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official source
+      description: Link to the platform.claude.com, code.claude.com, support.claude.com or github.com/anthropics page that confirms it
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date checked
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true

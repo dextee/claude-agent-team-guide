@@ -1,0 +1,152 @@
+{
+  "generation_date": "2026-10-15",
+  "method": "Built-in image generation via Codex (ChatGPT login)",
+  "tool_reported": "image_gen.imagegen, called by Codex CLI 0.162.1 through codex exec",
+  "exact_backend_model": null,
+  "backend_model_note": "The tool did not report which image model it used. No model name is claimed.",
+  "api_key_used": false,
+  "text_in_images": "None in the eight illustrations. The social preview text was added with Pillow after generation.",
+  "palette": {
+    "base": [
+      "warm ivory",
+      "terracotta",
+      "deep charcoal",
+      "soft gold"
+    ],
+    "model_accents": {
+      "Fable 5.1": "violet",
+      "Opus 5.5": "terracotta red",
+      "Sonnet 5.5": "sage green",
+      "Haiku 5.5": "sky blue"
+    }
+  },
+  "total_generations": 10,
+  "images": [
+    {
+      "file": "assets/images/hero.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide 16:9 landscape cover image at the top of a GitHub README for a guide about running a team of AI agents in Claude Code.\nPrimary request: a calm, striking editorial still-life of a lead coordinator's writing desk in a sunlit ivory studio. At the center, a charcoal oak desk holds a single open blank notebook and a brushed gold compass. Fine gold threads run from the desk outward to four small complementary instruments arranged on low terracotta plinths at different distances: a deep plum glass armillary sphere, a terracotta architect's dividers standing over a small intricate model structure, a sage-green ceramic balance scale, and a tiny dusty sky-blue hourglass beside a neat stack of small blank cards. The instruments feel like a quiet, capable team that the desk coordinates.\nComposition/framing: wide 16:9 landscape, slightly elevated three-quarter view, the desk and instruments in the lower-middle two thirds, a calm ivory plaster wall and soft light above giving breathing room; balanced and elegant.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1600,
+        900
+      ],
+      "bytes": 1170769,
+      "sha256": "4ede0d14e60156aeffdf7b3b6296b5c0baa152a87db998c6bca6331acf70c974",
+      "attempts": 1,
+      "post_processing": "Centre-cropped to 16:9 and resized to 1600x900. Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Charcoal oak desk with an open blank notebook and gold compass, gold threads to four plinths: violet glass armillary sphere, terracotta dividers over a model, sage balance scale, sky-blue hourglass. No text, logos, people or hands. Source was 1672x941; centre-cropped to 16:9 and resized to 1600x900."
+    },
+    {
+      "file": "assets/images/model-team.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape chapter illustration for a guide explaining which AI model to use for which job. Four complementary roles, no ranking.\nPrimary request: four distinct, beautifully crafted instruments standing on four separate low ivory plaster plinths in a row on a long charcoal oak shelf, each with exactly one accent colour:\n1) far left: a large armillary sphere whose rings are deep aubergine violet enamel (clearly purple, not red or brown) with brushed gold, nested around a small violet glass core, contemplative and intricate (deepest reasoning);\n2) center-left: terracotta-red architect's dividers and a precise brass scribing arm working on a small, complex unfinished architectural model (frontier, hard problems);\n3) center-right: a sage-green glazed ceramic balance scale with two small trays of tidy paper sheets in equilibrium (everyday balanced work);\n4) far right: a small dusty sky-blue glass hourglass beside a neat stack of small blank index cards and a little sorting tray (fast small jobs).\nEach instrument is the same visual family (ivory, brushed gold, charcoal) and differs only by its accent color and form; they look like peers on one team. Sizes vary gently but none dominates.\nComposition/framing: wide landscape, straight-on museum-display view, even spacing, warm ivory plaster wall behind, generous space above.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 1244297,
+      "sha256": "84c28c132913a1b0894d03ff7ede63d485a0f70104266b6fc1ee932fb89ad51a",
+      "attempts": 2,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Second attempt. The first attempt read as burgundy for the Fable instrument, too close to the terracotta Opus accent, so the prompt was changed to ask for clearly violet enamel. Final: violet armillary sphere (Fable 5.1), terracotta dividers over an unfinished model (Opus 5.5), sage balance scale (Sonnet 5.5), sky-blue hourglass with index cards (Haiku 5.5). Fine tick marks on the rings, no letters or numbers. Composition left to right matches the order of the guide."
+    },
+    {
+      "file": "assets/images/orchestration.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about a lead agent dispatching work to specialist subagents and gathering verified results.\nPrimary request: an elegant overhead three-quarter architectural model of a coordination studio on an ivory paper base. At the center sits a round charcoal oak lead desk with a brushed gold compass and a small open blank ledger. Fine gold threads radiate out to four smaller specialist stations on terracotta clay platforms: a reading station with a magnifying lens and stacked blank papers, a workbench with tiny tools and a small wooden model, a drafting station with rolled blank paper sheets, and an inspection station with a loupe and calipers. Small blank cream folders travel back along the threads toward the lead desk, where a tidy tray of returned folders is stamped with a simple gold check-mark-shaped wax seal (no letters).\nComposition/framing: wide landscape, clear hub-and-spoke layout readable at a glance, lots of calm ivory space between stations, no clutter.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 1467892,
+      "sha256": "ea10a38f11a4ce8313281b3914269ff569fefc627f12e38651ee4b1a5874bf31",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Overhead hub-and-spoke: round charcoal lead desk with compass, open ledger and a tray of returned folders; four terracotta stations for reading, building, drafting and inspection. Folders carry a plain check-shaped seal, no letters. The outer stations touch the frame edges slightly."
+    },
+    {
+      "file": "assets/images/workflow-coding.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about using an AI agent team for software engineering work.\nPrimary request: a calm craftsman's workbench as a metaphor for coding: a precise modular structure being assembled from interlocking ivory and terracotta blocks, like an architectural model of a system, with one charcoal block being fitted into place by a brushed gold jig. Beside it a neatly rolled blank blueprint, a small brass spirit level confirming the structure is true, and a tray of sorted spare components. Thin gold threads hint at modules connecting.\nComposition/framing: wide landscape, three-quarter view at bench height, the structure as the clear focal point, warm ivory plaster wall behind.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 1312891,
+      "sha256": "14f1e076621e0281b120a46aa6d8ae89a558a794434c2348404ddc589fe3bfde",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Modular ivory and terracotta block structure with a charcoal block lowered by a brass jig, sorted spare parts, rolled blank blueprint and brass spirit level. No text, no screens."
+    },
+    {
+      "file": "assets/images/workflow-research.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about using an AI agent team for research and evidence gathering.\nPrimary request: a scholar's reading table in a quiet sunlit library alcove: several open blank books and loose cream paper sources on the left, fine gold threads leading from them into a single large brass-rimmed reading lens on a stand, and on the right a small, neat stack of three cream cards tied with terracotta string, representing distilled, cited findings. A small terracotta pot of pencils and an ivory paper globe without any map detail sit nearby.\nComposition/framing: wide landscape, left-to-right flow from many sources to a focused synthesis, three-quarter view, calm ivory and charcoal shelving softly out of focus behind.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1619,
+        971
+      ],
+      "bytes": 1108874,
+      "sha256": "42dbb748661b2eb8e46875af208efa215d49af9ff45b8ea68686e992be3018e0",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Open books and loose papers feed gold threads into a brass reading lens; a tied stack of three cards stands for the distilled finding. Page texture is faint and not legible. A small generic classical bust sits on a background shelf; it is decorative and not a real person."
+    },
+    {
+      "file": "assets/images/workflow-review.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about independent review, auditing and verification of AI agent work.\nPrimary request: a quiet audit and verification scene. A completed small architectural model of a bridge in ivory and terracotta sits on a charcoal oak pedestal. On a separate, clearly distinct inspection table beside it: a brushed gold loupe on an articulated stand focused on one tiny joint of the bridge, gold calipers measuring a span, and a short row of blank cream evidence cards, one marked only with a small plain terracotta check-shaped wax seal. The work and the independent review station are visibly separate.\nComposition/framing: wide landscape, three-quarter view, the loupe and the inspected joint as the focal point, calm ivory space around.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 1135721,
+      "sha256": "c4ae8dabfe96c74c0e0031c008b9390fc7e43fd813e64dd23d7852b79bd64db8",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Finished model bridge on a charcoal pedestal, separate stone inspection table with a brass loupe on a stand focused on one pier, calipers, and a row of blank cards, one with a plain terracotta check-shaped seal. Caliper scale marks are fine and illegible."
+    },
+    {
+      "file": "assets/images/workflow-docs.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about using an AI agent team to write documentation.\nPrimary request: a writer's and bookbinder's table: a beautifully bound ivory book with a terracotta cloth spine lying open with blank pages, beside a neat stack of blank folded paper signatures being gathered in order, a bone folder, a spool of terracotta thread, a brushed gold fountain pen resting on a charcoal blotter, and a small stack of finished slim booklets with blank covers. Everything feels clear, orderly and edited.\nComposition/framing: wide landscape, slightly overhead three-quarter view, the open book as the focal point, generous ivory paper space.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 1488304,
+      "sha256": "3a8d934ad70f04de955c8633be5738fb37d4062b83bfe732324b80a4874f314f",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Open book with blank pages and a terracotta cloth spine, gathered folded signatures, finished slim books, bone folder, terracotta thread and a brass fountain pen on a charcoal blotter. No text."
+    },
+    {
+      "file": "assets/images/workflow-ops.png",
+      "prompt": "Use case: stylized-concept\nAsset type: wide landscape illustration for a guide section about using an AI agent team for operations, monitoring and routine maintenance tasks.\nPrimary request: a calm control-room-as-workshop metaphor: on a long charcoal oak console stand a row of three analog brass gauges with blank dial faces (no numbers, no markings except simple ticks), a small terracotta valve wheel, neatly coiled ivory cable, a brass mantel-style clock with a plain blank face, and a ledger of blank cream checklist cards in a wooden rack. Fine gold threads link the gauges to the card rack. The mood is steady, reliable, everything running quietly.\nComposition/framing: wide landscape, three-quarter view at console height, orderly rhythm of objects, warm ivory plaster wall behind.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 1472023,
+      "sha256": "414f084e9a14d5f68427a86359ca720308e710920e199dc8be850a5078770968",
+      "attempts": 1,
+      "post_processing": "Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Three brass gauges with blank faces and simple ticks, a terracotta valve wheel, coiled ivory cable, a blank-faced mantel clock and a rack of blank checklist cards linked by gold wires. No numbers. A folded cloth on the console rail is the only incidental object."
+    },
+    {
+      "file": "assets/social-preview.png",
+      "prompt": "Use case: stylized-concept\nAsset type: GitHub social preview background, very wide 2:1 landscape, will be cropped to 1280x640 and have a title added later in the empty left half.\nPrimary request: a minimal, striking still-life: on the right side only, a single brushed gold armillary sphere with deep aubergine violet enamel rings (clearly purple) next to a terracotta clay plinth, with fine gold threads connecting it to three small companion objects (a terracotta dividers, a sage-green small balance scale, a tiny dusty sky-blue hourglass). The entire left half of the image is a clean, smooth, softly lit warm ivory paper and plaster backdrop with nothing on it, reserved for a title.\nComposition/framing: very wide landscape, objects grouped compactly in the right 45 percent, bold simple silhouettes that read well as a small thumbnail, strong contrast with a deep charcoal tabletop edge along the bottom.\nStyle/medium: premium editorial still-life, like high-end architectural model photography for a design monograph; tactile, matte, handmade materials. Color palette: warm ivory and paper-white, terracotta and fired clay, deep charcoal, soft brushed gold; accents used sparingly. Materials/textures: unglazed terracotta, limewashed plaster, thick cotton paper, charcoal-stained oak, brushed gold brass, a little clear glass. Lighting/mood: soft warm late-afternoon window light, long gentle shadows, calm, quiet, thoughtful, premium. Composition: uncluttered, generous negative space, few objects, clear focal hierarchy.\nAvoid: robots, humanoids, androids, glowing brains, circuit boards, neon, holograms, sci-fi interfaces, people, hands, faces, screens with interfaces, fake UI, logos, brand marks, trademarks, letters, words, numbers, labels, watermarks, signatures.",
+      "dimensions": [
+        1280,
+        640
+      ],
+      "bytes": 651022,
+      "sha256": "f8b7df8c8ae8e1e9956ba5430c27d597304e1ee64ebf726f4c9ea7cf99aa45ee",
+      "attempts": 1,
+      "post_processing": "Resized to 1280x640. Text set with Pillow in Fraunces SemiBold (title) and Inter Medium (eyebrow and subtitle), both SIL Open Font License fonts that are not shipped in this repository. Colour depth rounded to 6 bits per channel and saved as an optimised PNG to keep the file under 1.5 MB. No visible change at full size.",
+      "visually_inspected": true,
+      "inspection_notes": "Accepted on first attempt. Background generated at 1774x887 with the left half left empty, then resized to exactly 1280x640. The title 'Claude Code Agent Team Guide', the line 'A FIELD GUIDE', the subtitle 'Pick the right model, delegate well, and verify the work.' and four accent dots (violet, terracotta, sage, sky blue) were added with Pillow, not by the image model, so the lettering is exact. Checked at 320x160: the title stays legible."
+    }
+  ]
+}
