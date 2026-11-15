@@ -20,12 +20,12 @@ Warm ivory paper and plaster, terracotta and fired clay, deep charcoal oak and s
 
 | Model | Accent | Instrument |
 |---|---|---|
-| Fable 5.1 | Violet | Armillary sphere: deepest reasoning |
+| Fable 5.2 | Violet | Armillary sphere: deepest reasoning |
 | Opus 5.5 | Terracotta red | Dividers over an unfinished model: frontier, hard tasks |
 | Sonnet 5.5 | Sage green | Balance scale: everyday, balanced work |
 | Haiku 5.5 | Sky blue | Small hourglass and index cards: fast, small jobs |
 
-The pairing of model and instrument is this guide's metaphor. It is not a ranking or a capability measurement.
+The pairing of model and instrument is this guide's metaphor. It is not a ranking or a capability measurement. The images were made when the guide used Fable 5.1 (the manifest records that); the violet accent carries over to Fable 5.2 unchanged.
 
 ## Gallery
 

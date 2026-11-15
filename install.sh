@@ -20,7 +20,7 @@
 #                     edited since; edited files are kept and reported
 #   -h, --help        Show this help
 #
-# Set AGENT_TEAM_REF=<tag or commit> to download agents from a fixed release.
+# Set AGENT_TEAM_REF=<full commit SHA> to download agents from a fixed version.
 
 set -euo pipefail
 
@@ -33,7 +33,7 @@ main() {
   local REF="${AGENT_TEAM_REF:-main}"
   local RAW="https://raw.githubusercontent.com/${REPO}/${REF}"
   local AGENTS=(architect implementer worker explorer reviewer auditor researcher editor)
-  local MIN_VERSION="2.1.293"
+  local MIN_VERSION="2.1.321"
   local MANIFEST_NAME=".agent-team-manifest"
 
   local dry_run=0 with_settings=0 force=0 uninstall=0 project=""
@@ -92,7 +92,7 @@ main() {
     local have
     have="$(claude --version </dev/null 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
     if [ -n "$have" ] && [ "$(printf '%s\n%s\n' "$MIN_VERSION" "$have" | sort -V | head -n1)" != "$MIN_VERSION" ]; then
-      warn "Claude Code $have found. These agents need $MIN_VERSION or later (Haiku 5.5). Run: claude update"
+      warn "Claude Code $have found. These agents need $MIN_VERSION or later (Fable 5.2). Run: claude update"
     fi
   else
     warn "claude was not found on PATH. Files will still be installed; install Claude Code to use them."
@@ -241,6 +241,8 @@ Next steps:
   3. Run /tasks while it works to see which model each agent is running on.
   4. Fable agents (architect, auditor) may bill usage credits on some plans. In an
      interactive session you are asked first; with claude -p you are not.
+  5. Subagents start in the background; their reports arrive in a later turn.
+     The worker runs in its own git worktree. See docs/start-here.md.
 
 Guide: https://github.com/$REPO
 EOF

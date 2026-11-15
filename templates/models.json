@@ -1,0 +1,82 @@
+{
+  "$comment": "Single source of truth for model IDs, list rates, effort defaults and Claude Code minimum versions. scripts/validate.py reads this file and checks the agent files, installer and docs against it. Every value was checked on the date in checked_on against the URLs in sources. Update this file first when Anthropic changes a model or price, then run python3 scripts/validate.py.",
+  "checked_on": "2026-11-15",
+  "sources": {
+    "models": "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "pricing": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "effort": "https://platform.claude.com/docs/en/build-with-claude/effort",
+    "claude_code_models": "https://code.claude.com/docs/en/model-config"
+  },
+  "current": [
+    {
+      "id": "claude-fable-5-2",
+      "name": "Fable 5.2",
+      "alias": "fable",
+      "description": "For demanding reasoning and long-horizon agentic work",
+      "latency": "Moderate",
+      "input_usd_per_mtok": "8.00",
+      "cache_read_usd_per_mtok": "0.20",
+      "output_usd_per_mtok": "40.00",
+      "default_effort_api": "high",
+      "default_effort_claude_code": "medium",
+      "min_claude_code": "2.1.321"
+    },
+    {
+      "id": "claude-opus-5-5",
+      "name": "Opus 5.5",
+      "alias": "opus",
+      "description": "For long-running agentic coding and knowledge work",
+      "latency": "Moderate",
+      "input_usd_per_mtok": "4.00",
+      "cache_read_usd_per_mtok": "0.20",
+      "output_usd_per_mtok": "20.00",
+      "default_effort_api": "medium",
+      "default_effort_claude_code": "medium",
+      "min_claude_code": "2.1.280"
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "name": "Sonnet 5.5",
+      "alias": "sonnet",
+      "description": "The best combination of speed and intelligence",
+      "latency": "Fast",
+      "input_usd_per_mtok": "2.00",
+      "cache_read_usd_per_mtok": "0.10",
+      "output_usd_per_mtok": "10.00",
+      "default_effort_api": "high",
+      "default_effort_claude_code": "medium",
+      "min_claude_code": "2.1.284"
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "name": "Haiku 5.5",
+      "alias": "haiku",
+      "description": "For high-volume, latency-sensitive tasks such as classification, extraction, and routing",
+      "latency": "Fastest",
+      "input_usd_per_mtok": "0.10",
+      "cache_read_usd_per_mtok": "0.01",
+      "output_usd_per_mtok": "0.50",
+      "price_note": "Prompts up to 100,000 tokens. Over that, the whole request bills at $0.50 input, $0.05 cache read and $2.50 output.",
+      "default_effort_api": "medium",
+      "default_effort_claude_code": "medium",
+      "min_claude_code": "2.1.293"
+    }
+  ],
+  "older": [
+    {
+      "id": "claude-fable-5-1",
+      "name": "Fable 5.1",
+      "note": "Previous Fable. Still selectable by ID; the architect and auditor used it until guide 3.0.0.",
+      "input_usd_per_mtok": "10.00",
+      "cache_read_usd_per_mtok": "0.25",
+      "output_usd_per_mtok": "50.00",
+      "default_effort_claude_code": "high",
+      "min_claude_code": "2.1.257"
+    }
+  ],
+  "other_known_names": [
+    "Fable 5", "Opus 5", "Opus 4.8", "Opus 4.7", "Opus 4.6", "Opus 4.5",
+    "Sonnet 5", "Sonnet 4.6", "Sonnet 4.5", "Haiku 4.5"
+  ],
+  "effort_levels": ["low", "medium", "high", "xhigh", "max"]
+}

@@ -21,7 +21,6 @@ Examples to explore include invoice checks, prospect research, support routing a
 | VYR workflows labelled LIVE | Internal VYR use, within the limits stated on the official page. Not evidence of a client deployment |
 | VYR workflows labelled DEMO | Working demonstrations on sample data |
 | VYR workflows labelled BUILT FOR YOU | Designs for a scoped implementation; integrations must be agreed |
-| Savings examples | Assumptions to test against your baseline, not a forecast |
 
 The [official Agent OS page](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=status_source) is the source for current status. This guide's [validation report](VALIDATION.md) covers its own checks.
 
@@ -53,6 +52,6 @@ A stronger model alone does not make a useful business outcome. The evidence tha
 
 ## Keep learning or contribute
 
-Use the [24-task selector](docs/task-selector.md), [12 workflow recipes](docs/workflows.md) and [evaluation worksheet](templates/evaluation.csv). Corrections belong in [repository issues](https://github.com/dextee/claude-agent-team-guide/issues). Business enquiries go to VYR through the link above.
+Use the [ten-minute start](docs/start-here.md), [24-task selector](docs/task-selector.md), [12 workflow recipes](docs/workflows.md) and [evaluation worksheet](templates/evaluation.csv). Corrections belong in [repository issues](https://github.com/dextee/claude-agent-team-guide/issues). Business enquiries go to VYR through the link above.
 
-*Commercial and service links reviewed: 15 October 2026. This guide is independently maintained; it is not an Anthropic endorsement of VYR.*
+*Commercial and service links reviewed: 15 October 2026; Agent OS status labels rechecked 15 November 2026. This guide is independently maintained; it is not an Anthropic endorsement of VYR.*

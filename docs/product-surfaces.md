@@ -2,11 +2,11 @@
 
 # Which Claude product are you using?
 
-Checked against official documentation: **15 October 2026**. The agent files in this repository are **Claude Code subagents**. They work wherever Claude Code reads `.claude/agents/`. Ordinary Claude chat does not load them.
+Checked against official documentation: **15 November 2026**. The agent files in this repository are **Claude Code subagents**. They work wherever Claude Code reads `.claude/agents/`. Ordinary Claude chat does not load them.
 
 | Surface | What this guide means there | What to check |
 |---|---|---|
-| **Claude Code CLI** (terminal) | Full support: install the agents, use `/model`, `/effort`, `/tasks`, plugins | Version v2.1.293 or later: `claude --version` |
+| **Claude Code CLI** (terminal) | Full support: install the agents, use `/model`, `/effort`, `/tasks`, plugins | Version v2.1.321 or later: `claude --version` |
 | **Claude Code in VS Code** | The extension runs Claude Code in the editor, with the same project files | Agents load from the same folders; confirm with a test delegation |
 | **Claude Code in JetBrains IDEs** | The plugin uses the Claude Code CLI, installed separately | CLI version as above |
 | **Claude desktop app, Code tab** | Includes Claude Code; no separate CLI install. Requires a paid subscription | Confirm the agents appear by asking Claude to list available subagents |
@@ -52,7 +52,7 @@ options = ClaudeAgentOptions(
             description="Evidence-only review before merge.",
             prompt="Review the change. Every finding must cite a file and line.",
             tools=["Read", "Grep", "Glob", "Bash"],
-            model="claude-fable-5-1",
+            model="claude-fable-5-2",
             effort="high",
         ),
     },
@@ -61,24 +61,34 @@ options = ClaudeAgentOptions(
 
 Pass `options` to `query()` with your prompt. Agents defined in code take precedence over files with the same name. Field reference: [AgentDefinition](https://code.claude.com/docs/en/agent-sdk/subagents). Python package `claude-agent-sdk`; TypeScript `@anthropic-ai/claude-agent-sdk`.
 
-Fable requests from the SDK can bill usage credits without a consent prompt on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config)). Set a spend cap with `max_budget_usd`.
+Fable requests from the SDK can bill usage credits without a consent prompt on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config)). Set a spend cap with `max_budget_usd`, and depth and concurrency caps through the `env` option; see [cost and limits](cost-and-evaluation.md#built-in-limits-and-the-caps-you-can-set).
+
+In the SDK, as in the CLI, only a subagent's final message returns to the parent, and the parent may summarize it. To pass a subagent's report through verbatim, say so in the prompt you give the main `query()` call ([Agent SDK subagents](https://code.claude.com/docs/en/agent-sdk/subagents)).
 
 ## Third-party providers
 
-| | Anthropic API | Claude Platform on AWS | Amazon Bedrock, Google Cloud | Microsoft Foundry |
-|---|---|---|---|---|
-| `opus` alias resolves to | Opus 5.5 | Opus 5.5 | Opus 5.5 | Opus 4.6 |
-| `sonnet` alias resolves to | Sonnet 5.5 | Sonnet 4.6 | Sonnet 4.5 | Sonnet 4.5 |
-| `haiku` alias resolves to | Haiku 5.5 | Haiku 4.5 | Haiku 4.5 | Haiku 4.5 |
-| Advisor tool | Yes (experimental) | No | No | No |
-| Fast mode | Yes (research preview) | No | No | No |
+How the Claude Code aliases resolve, and where the advisor and fast mode work in Claude Code:
 
-Source: [model configuration](https://code.claude.com/docs/en/model-config), [advisor](https://code.claude.com/docs/en/advisor), [fast mode](https://code.claude.com/docs/en/fast-mode). This is why the agent files pin full model IDs instead of aliases: an alias can mean an older model on another provider. A pinned ID makes the intended version explicit, so check that each one is enabled in your account. Anthropic recommends pinning model versions with `ANTHROPIC_DEFAULT_OPUS_MODEL` and related variables before rolling out on third-party providers.
+| | Anthropic API | Claude Platform on AWS | Claude Models on Google Cloud (Anthropic managed) | Amazon Bedrock, Google Cloud's Agent Platform | Microsoft Foundry |
+|---|---|---|---|---|---|
+| `opus` alias resolves to | Opus 5.5 | Opus 5.5 | Opus 5.5 | Opus 5.5 | Opus 4.6 |
+| `sonnet` alias resolves to | Sonnet 5.5 | Sonnet 4.6 | Sonnet 5.5 | Sonnet 4.5 | Sonnet 4.5 |
+| `haiku` alias resolves to | Haiku 5.5 | Haiku 4.5 | Haiku 4.5 | Haiku 4.5 | Haiku 4.5 |
+| Advisor (experimental) | Yes | Yes, from v2.1.300 | Yes, from v2.1.300 | No | No |
+| Fast mode in Claude Code | Yes (Console, or usage credits on subscription plans) | No | Not stated on the fast mode page | Bedrock: no. Agent Platform: Fable 5.2 only, with conditions, from v2.1.322 | No |
+
+The `fable` alias resolves to Fable 5.2 everywhere except Claude apps gateway sessions. Sources: [model configuration](https://code.claude.com/docs/en/model-config#model-aliases), [advisor](https://code.claude.com/docs/en/advisor), [fast mode](https://code.claude.com/docs/en/fast-mode). On the Claude API side (not Claude Code), the [pricing page](https://platform.claude.com/docs/en/about-claude/pricing) lists further fast-mode platforms, such as Claude Models on Google Cloud (Anthropic managed) for Opus 5.5 and Fable 5.2.
+
+This is why the agent files pin full model IDs instead of aliases: an alias can mean an older model on another provider. A pinned ID makes the intended version explicit, so check that each one is enabled in your account. Anthropic recommends pinning model versions with `ANTHROPIC_DEFAULT_OPUS_MODEL` and related variables before rolling out on third-party providers.
 
 ## CI and chat integrations
 
-- **GitHub Actions:** run `/install-github-app` inside Claude Code to set up the [Claude Code GitHub Action](https://github.com/anthropics/claude-code-action). It needs repository admin rights; the quick setup is for direct Anthropic API users.
+- **GitHub Actions:** run `/install-github-app` inside Claude Code to set up the [Claude Code GitHub Action](https://github.com/anthropics/claude-code-action). Quick setup works with the Claude API and Claude subscriptions; Bedrock, Google Cloud's Agent Platform and Foundry use a separate cloud-provider setup. Either path needs admin access to the repository ([GitHub Actions](https://code.claude.com/docs/en/github-actions)).
 - **Non-interactive runs:** `claude -p "..."` runs one prompt and exits. Fable billing consent is not requested in this mode.
 - **Slack:** Claude Code can take tasks from Slack mentions ([overview](https://code.claude.com/docs/en/overview)).
 
 Project agents committed to the repository are available to any Claude Code run on that checkout.
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Product facts checked 2026-11-15 against the pages in [SOURCES.md](../SOURCES.md).*

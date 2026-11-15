@@ -1,8 +1,10 @@
-[Home](../README.md) · [Task selector](task-selector.md) · [Delegation template](../templates/task-brief.md)
+[Home](../README.md) · [Orchestration patterns](orchestration-patterns.md) · [Task selector](task-selector.md) · [Delegation template](../templates/task-brief.md)
 
-# Twelve workflows with useful handoffs
+# Twelve recipes with useful handoffs
 
-These recipes are editorial starting points that use [the eight installed agents](agents.md). With the plugin install, prefix names with `agent-team:`, for example `agent-team:reviewer`. Outside Claude Code, run the stages one after another ([product surfaces](product-surfaces.md)).
+These recipes apply the [orchestration patterns](orchestration-patterns.md) to common jobs, using [the eight installed agents](agents.md). Each has a lead, a team, a copy-paste prompt, and a line that says what proves it worked. With the plugin install, prefix agent names with `agent-team:`, for example `agent-team:reviewer`. Outside Claude Code, run the stages one after another ([product surfaces](product-surfaces.md)).
+
+Every prompt assumes two things from [how subagents run](how-subagents-run.md): subagents start in the background, so the lead must wait for their reports; and each subagent sees only its brief, so the prompt says what to pass. Ask every agent to end with the [return contract](../templates/return-contract.md).
 
 Illustrations are conceptual artwork, not screenshots or evidence of completed work. [Provenance](../assets/README.md).
 
@@ -10,46 +12,51 @@ Illustrations are conceptual artwork, not screenshots or evidence of completed w
 
 <img src="../assets/images/workflow-coding.png" alt="Ivory and terracotta blocks being assembled into a modular structure, with a brass jig placing a charcoal block and a spirit level beside it" width="100%">
 
-**Lead:** Opus 5.5 / medium. **Team:** explorer, implementer, reviewer; architect only if the design is unresolved.
+**Lead:** Opus 5.5 / medium. **Team:** explorer, implementer, reviewer; architect only if the design is unresolved. **Pattern:** [pipeline](orchestration-patterns.md#pattern-3-pipeline).
 
 ```text
 Build [feature]. Success means [observable behavior].
 Use the explorer agent to find the responsible files and existing tests.
 If the approach is unclear, use the architect agent to plan it with
-acceptance checks. Have the implementer build it and run the tests, then
-ask the reviewer to check the diff against the plan. Fix material findings.
-Return the changed files, the checks run and any remaining limits.
+acceptance checks. Have the implementer build it and run the tests. Then
+give the reviewer the request, the plan and the diff (not the
+implementer's summary). Fix material findings. Wait for every report, then
+re-run the tests yourself and show me the output.
 ```
 
-**Done means:** the requested behavior works, nearby behavior still works, and verification covers the actual change. A passing build alone does not show the user flow works.
+**What proves it worked:** the requested behavior works when you run it, nearby tests still pass in your own run, and the reviewer's findings cite lines in the final diff. A passing build alone does not show the user flow works.
 
 ## 2. Investigate a hard bug
 
-**Lead:** Opus 5.5 / high. **Team:** explorer for evidence; architect when hypotheses compete.
+**Lead:** Opus 5.5 / high. **Team:** explorers, one per hypothesis; architect when hypotheses compete. **Pattern:** [competing hypotheses](orchestration-patterns.md#pattern-6-competing-hypotheses).
 
 ```text
 Investigate [failure]. Reproduction: [steps]. Expected: [behavior].
-Separate observations from hypotheses. Use the explorer agent to collect
-evidence for each hypothesis. If two or more remain plausible, ask the
-architect agent which evidence would distinguish them. Fix only the proven
-cause. Show the reproduction now passes and check the closest regression.
+Separate observations from hypotheses. For each plausible cause, start a
+separate explorer to collect evidence that would confirm or rule it out.
+Wait for all of them. If two or more remain plausible, ask the architect
+which evidence would distinguish them. Fix only the proven cause. Show the
+reproduction now passes and check the closest regression.
 ```
 
-**Handoff:** the evidence must explain why the cause predicts the observed failure. Do not keep a speculative patch because unrelated tests passed.
+**What proves it worked:** the reproduction fails before the fix and passes after, the cause explains why the failure happened, and each rejected hypothesis has specific evidence against it.
 
 ## 3. Run a large refactor
 
-**Lead:** Opus 5.5 / medium. **Team:** architect splits work; workers own disjoint files; reviewer checks the integrated result.
+**Lead:** Opus 5.5 / medium. **Team:** architect splits; workers in their own worktrees; reviewer on the integrated result. **Pattern:** [parallel writers in worktrees](orchestration-patterns.md#pattern-4-parallel-writers-in-worktrees).
 
 ```text
-Refactor [area] while preserving [public behavior]. Record the base commit
-and the acceptance tests. Use the architect agent to split the work into
-chunks with no shared files. Run one worker agent per chunk in parallel.
-Integrate the results yourself, run the full test suite, then ask the
-reviewer agent to check the combined diff.
+Refactor [area] while preserving [public behavior]. Commit my current work
+and record HEAD as the base SHA; confirm worktree.baseRef is "head".
+Use the architect agent to split the work into chunks with no shared
+files. Run one worker agent per chunk in parallel, each given the base
+SHA, its files and its check. Wait for every worker; list each branch and
+commit. Merge them one at a time with --no-ff, stop on the first conflict,
+run the full test suite, then ask the reviewer to check the combined diff
+against the original request.
 ```
 
-**Done means:** the merged state passes. Separate chunk checks do not prove the integrated result works. If a worker runs with `isolation: worktree`, its branch starts from your default branch, not your current `HEAD` ([subagent docs](https://code.claude.com/docs/en/sub-agents)).
+**What proves it worked:** the merged state passes the full suite in your own run, no file appears in two workers' diffs, and `git log --graph` shows each worker's commit on the base SHA. Separate chunk checks do not prove the integrated result works. [Parallel work and worktrees](parallel-work-and-worktrees.md).
 
 ## 4. Review before merge
 
@@ -58,45 +65,49 @@ reviewer agent to check the combined diff.
 **Lead:** Opus 5.5 / medium. **Team:** reviewer for routine changes; auditor for consequential ones.
 
 ```text
-Review [branch or PR] against [requirements]. Use the reviewer agent for a
-routine pass. If the change touches authentication, payments, data
-deletion, migrations or public APIs, use the auditor agent instead.
-Report only findings with a file and line or a reproducing command.
-Then tell me which requirements were verified and which were not checked.
+Review [branch or PR] against [requirements]. Give the reviewer agent the
+requirements and the diff, nothing else. If the change touches
+authentication, payments, data deletion, migrations or public APIs, use the
+auditor agent instead. Report only findings with a file and line or a
+reproducing command. Then list which requirements were verified and which
+were not checked.
 ```
 
-**Done means:** every requirement has evidence at the candidate commit. "No issues found" is not the same as full coverage.
+**What proves it worked:** every requirement is listed as verified (with evidence) or not checked, and every finding has a location you can open. "No issues found" is not the same as full coverage.
 
 ## 5. Ship a security-sensitive change
 
-**Lead:** Opus 5.5 / high. **Team:** architect states threat assumptions; implementer builds; auditor reviews.
+**Lead:** Opus 5.5 / high. **Team:** architect states threat assumptions; implementer builds; auditor reviews; a second, fresh auditor verifies. **Pattern:** [three-stage audit loop](orchestration-patterns.md#pattern-5-three-stage-audit-loop).
 
 ```text
 Change [component] to [goal]. First, use the architect agent to list the
 threat assumptions, trust boundaries and abuse cases, with a test for each.
-Have the implementer build the change and those tests. Then use the
-auditor agent to review the diff against the threat list. Do not mark this
-done until every listed abuse case has a passing test or a stated reason.
+Have the implementer build the change and those tests. Use the auditor
+agent to review the diff against the threat list. Have the implementer fix
+accepted findings. Then start a NEW auditor (not a resume, not a fork) with
+only the threat list, the accepted findings, the final diff and the test
+commands, and have it verify each fix.
 ```
 
-**Done means:** the abuse cases are tested. An AI review is not a substitute for a human security review where your policy requires one.
+**What proves it worked:** every listed abuse case has a passing test you can run, the second auditor is a different agent ID whose brief contains no implementer summary, and it marks each finding fixed with its own evidence. An AI review is not a substitute for a human security review where your policy requires one.
 
 ## 6. Produce a research decision brief
 
 <img src="../assets/images/workflow-research.png" alt="Open books and loose papers feeding gold threads through a brass reading lens toward a small tied stack of finding cards" width="100%">
 
-**Lead:** Opus 5.5 / high. **Team:** researchers split by question, then the editor.
+**Lead:** Opus 5.5 / high. **Team:** researchers split by question, then the editor. **Pattern:** [fan-out, fan-in](orchestration-patterns.md#pattern-2-fan-out-fan-in).
 
 ```text
 Research [decision] for [audience], judged on [criteria]. Split it into
 independent questions and run one researcher agent per question in
 parallel. Each must return dated primary sources and mark inferences.
-Reconcile conflicts yourself. Then have the editor agent write a one-page
-brief: recommendation, strongest alternative, and what evidence would
-change the choice.
+Wait for all of them and list any that failed. Reconcile conflicts
+yourself. Then have the editor agent write a one-page brief:
+recommendation, strongest alternative, and what evidence would change the
+choice.
 ```
 
-**Done means:** each criterion is covered, key claims have reachable citations, and the brief separates evidence from inference.
+**What proves it worked:** each criterion is covered, you can open the source behind each key claim and find the claim there, and the brief separates evidence from inference.
 
 ## 7. Write documentation from the code
 
@@ -107,19 +118,19 @@ change the choice.
 ```text
 Write [README / setup guide / API reference] for [audience]. Use the
 explorer agent to collect the real commands, configuration keys, defaults
-and file paths. Have the editor agent write from that evidence only. Run
-every command in the document that is safe to run, and list any you could
-not verify.
+and file paths, with file and line for each. Have the editor agent write
+from that evidence only. Run every command in the document that is safe to
+run, and list any you could not verify.
 ```
 
-**Done means:** every command and setting traces to the code, and the safe ones were run.
+**What proves it worked:** every command and setting in the document traces to a file and line the explorer cited, and the safe commands were run with their output shown.
 
 ## 8. Prepare release notes
 
 **Lead:** Sonnet 5.5 / medium. **Team:** the lead gathers git history; explorer reads changed files; editor writes.
 
 ```text
-Draft release notes for [version] from [base tag] to [head]. Run
+Draft release notes for [version] from [base ref] to [head]. Run
 `git log --oneline [base]..[head]` and `git diff --stat [base]..[head]`
 yourself. Pass the output to the explorer agent and have it read the
 changed files to group changes as features, fixes, breaking changes and
@@ -129,7 +140,7 @@ whose impact you could not confirm from the code.
 
 The explorer has Read, Glob and Grep only, so it cannot run git. The lead runs commands and hands over the output.
 
-**Done means:** every line maps to a commit, and breaking changes include the migration step.
+**What proves it worked:** every line in the notes maps to a commit in the log you ran, and each breaking change includes its migration step.
 
 ## 9. Triage an incident
 
@@ -138,29 +149,30 @@ The explorer has Read, Glob and Grep only, so it cannot run git. The lead runs c
 **Lead:** Opus 5.5 / high. **Team:** explorer for code and config in the repo; reviewer for read-only commands; one owner for remediation.
 
 ```text
-Users report [symptom] since [time]. Export the relevant logs to
-[path] first. In parallel, use the explorer agent to read [path] and the
-config files changed recently, and the reviewer agent to run read-only
-commands such as `git log --since="[time]"`. Build a timeline. Propose the most likely cause and the cheapest safe mitigation.
-Do not change production. List the commands you would run and wait for my
+Users report [symptom] since [time]. Export the relevant logs to [path]
+first. In parallel, use the explorer agent to read [path] and the config
+files changed recently, and the reviewer agent to run read-only commands
+such as `git log --since="[time]"`. Wait for both. Build a timeline.
+Propose the most likely cause and the cheapest safe mitigation. Do not
+change production. List the commands you would run and wait for my
 approval before any of them.
 ```
 
-**Ownership:** one agent or person owns each live system. Parallel agents gather evidence; they do not act on production at the same time.
+**What proves it worked:** each timeline entry cites a log line or commit, the proposed cause explains the start time, and nothing ran against production before your approval.
 
 ## 10. Upgrade a dependency
 
-**Lead:** Opus 5.5 / medium. **Team:** researcher reads the upgrade notes; implementer upgrades; reviewer checks.
+**Lead:** Opus 5.5 / medium. **Team:** researcher reads the upgrade notes; explorer finds call sites; implementer upgrades; reviewer checks.
 
 ```text
 Upgrade [package] from [old] to [new]. Use the researcher agent to collect
 the official migration notes and breaking changes. Use the explorer agent
-to find every affected call site. Have the implementer make the upgrade and
-fix breakages, then run the full test suite. Ask the reviewer to check for
-behavior changes the tests would not catch.
+to find every affected call site. Wait for both. Have the implementer make
+the upgrade and fix breakages, then run the full test suite. Ask the
+reviewer to check for behavior changes the tests would not catch.
 ```
 
-**Done means:** build and tests pass, and each breaking change in the notes is either handled or shown not to apply.
+**What proves it worked:** build and tests pass in your own run, and each breaking change in the official notes is either handled at a cited call site or shown not to apply.
 
 ## 11. Reconcile data or invoices
 
@@ -174,7 +186,7 @@ underlying records. Explain every remaining difference; never treat
 missing data as zero.
 ```
 
-**Done means:** totals reconcile, or every difference is explained. A formatted spreadsheet is not the verification.
+**What proves it worked:** totals recalculated from the records match, or every difference is listed with its cause. A formatted spreadsheet is not the verification.
 
 ## 12. Cut the cost of a recurring workflow
 
@@ -188,4 +200,8 @@ route only if it meets the quality bar, and define which cases must still
 go to the stronger model.
 ```
 
-**Done means:** the choice rests on measured, completed-task results. Include the current model at a lower effort as one candidate; Anthropic notes that tuning effort is often a better lever than switching models. [Evaluation worksheet](../templates/evaluation.csv) · [Cost guide](cost-and-evaluation.md).
+**What proves it worked:** the choice rests on measured, completed-task results for the same cases, including the failures. Include the current model at a lower effort as one candidate; Anthropic notes that tuning effort is often a better lever than switching models. [Evaluation worksheet](../templates/evaluation.csv) · [Cost and limits](cost-and-evaluation.md).
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Product facts checked 2026-11-15 against the pages in [SOURCES.md](../SOURCES.md).*

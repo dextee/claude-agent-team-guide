@@ -2,104 +2,47 @@
 
 # Claude Code Agent Team Guide
 
-### Four models. Four moves. One result you can prove.
+### Run a team of Claude Code subagents you can trust.
 
-A field guide to choosing **Claude Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5** for each job, plus eight installable Claude Code subagents that pin the right model and effort to every role.
+How to split work across subagents, hand it off, run it in parallel without collisions, and prove the result, plus eight installable agents that pin the right model (Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5) and effort to each role.
 
-[![Docs checked](https://img.shields.io/badge/docs_checked-2026--10--15-356b57)](SOURCES.md)
-[![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.293%2B-c57c55)](https://code.claude.com/docs/en/model-config)
+[![Docs checked](https://img.shields.io/badge/docs_checked-2026--11--15-356b57)](SOURCES.md)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.321%2B-c57c55)](https://code.claude.com/docs/en/model-config)
 [![Agents](https://img.shields.io/badge/subagents-8-333333)](docs/agents.md)
 [![validate](https://github.com/dextee/claude-agent-team-guide/actions/workflows/validate.yml/badge.svg)](https://github.com/dextee/claude-agent-team-guide/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-333333)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/dextee/claude-agent-team-guide?style=social)](https://github.com/dextee/claude-agent-team-guide/stargazers)
 
-**Checked against official Anthropic documentation on 15 October 2026.** Model assignments are starting points to test on your own work, not benchmark results. This is an independent guide, not an Anthropic publication.
+**Checked against official Anthropic documentation on 15 November 2026.** Team designs and model assignments are starting points to test on your own work, not benchmark results. This is an independent guide, not an Anthropic publication.
 
 Maintained by **[Dexter Ng](https://github.com/dextee), CTO & Cybersecurity Lead at [VYR](https://vyrwork.com/about?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_author)**. [Explore VYR Agent OS](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_intro) · [Work with VYR](WORK_WITH_VYR.md)
 
 ## TL;DR
 
-- **Start with Opus 5.5 at `medium` effort.** It is Anthropic's recommended starting point and Claude Code's default on paid plans.
-- **Step down** to Sonnet 5.5 for scoped work and Haiku 5.5 for fast, checkable lookups.
-- **Step up** to Fable 5.1 when the decision is ambiguous, high-stakes or still failing on Opus at higher effort.
-- **Change effort before you change models.** Raise it when evidence shows the task needs more depth.
-- **Install eight pinned subagents in one command** and let the main session delegate: map, plan, build, prove.
+- **Default to one session.** Delegate when a subagent keeps noise out of the lead's context, runs independent work in parallel, or puts a cheaper model on checkable work. [When to delegate](docs/when-to-delegate.md).
+- **Subagents start in the background** and report through a completion notification in a later turn. Only their final message comes back. [How subagents run](docs/how-subagents-run.md).
+- **Brief in, evidence out.** Each subagent sees only its brief; each must return evidence, not a story. [Handoff contracts](docs/handoff-contracts.md).
+- **Parallel writers get their own git worktree**, and the lead integrates. [Parallel work](docs/parallel-work-and-worktrees.md).
+- **The verifier is never the implementer**, never a fork, and gets the original brief. [Three-stage audit loop](docs/orchestration-patterns.md#pattern-5-three-stage-audit-loop).
+- **Start on Opus 5.5 at `medium`**, step down for checkable work, step up to Fable 5.2 on evidence. [Models and effort](docs/models-and-effort.md).
 
 ## Contents
 
-- [Choose in 30 seconds](#choose-in-30-seconds)
-- [The Quartet: map, plan, build, prove](#the-quartet-map-plan-build-prove)
-- [Your agent team in 60 seconds](#your-agent-team-in-60-seconds)
+- [Ten-minute path](#ten-minute-path)
+- [Six rules for a team you can trust](#six-rules-for-a-team-you-can-trust)
+- [The guide, chapter by chapter](#the-guide-chapter-by-chapter)
 - [The eight agents](#the-eight-agents)
+- [Choose a model in 30 seconds](#choose-a-model-in-30-seconds)
+- [Patterns at a glance](#patterns-at-a-glance)
 - [Install options](#install-options)
-- [Choose the smallest useful team](#choose-the-smallest-useful-team)
-- [Recipes you can use today](#recipes-you-can-use-today)
-- [Effort: start at the default, escalate on evidence](#effort-start-at-the-default-escalate-on-evidence)
-- [Keep quality and cost visible](#keep-quality-and-cost-visible)
+- [Cost and limits on one screen](#cost-and-limits-on-one-screen)
 - [Common questions](#common-questions)
 - [Part of the Agent Team Guide trilogy](#part-of-the-agent-team-guide-trilogy)
-- [See agents work toward a business goal](#see-agents-work-toward-a-business-goal)
-- [Apply the approach with VYR](#apply-the-approach-with-vyr)
-- [If this helped](#if-this-helped)
 - [Sources, artwork and maintenance](#sources-artwork-and-maintenance)
 
-| I want to… | Start here |
-|---|---|
-| Pick a model for today's task | [24-task selector](docs/task-selector.md) |
-| Understand models, effort and prices | [Models and effort](docs/models-and-effort.md) |
-| Install and verify the team | [Setup](SETUP.md) |
-| Copy a complete workflow prompt | [12 workflow recipes](docs/workflows.md) |
-| Use this outside the terminal | [Choose your product](docs/product-surfaces.md) |
-| Compare cost per finished task | [Cost and evaluation](docs/cost-and-evaluation.md) |
-| Come from the ChatGPT or Kimi guide | [Role mapping across the trilogy](docs/from-chatgpt-and-kimi.md) |
-| See business workflows built with agents | [14-workflow atlas](docs/atlas/README.md) |
-| Check the evidence | [Sources](SOURCES.md) · [Validation](VALIDATION.md) |
+## Ten-minute path
 
-## Choose in 30 seconds
-
-<p align="center"><img src="assets/images/model-team.png" alt="Four instruments on ivory plinths: a violet armillary sphere, terracotta dividers over a model, a sage balance scale and a sky-blue hourglass" width="520"></p>
-
-| Model | Reach for it when… | Example jobs | Input / output, USD per 1M tokens |
-|---|---|---|---|
-| **Fable 5.1** | The decision is hard, ambiguous or expensive to get wrong | Architecture with conflicting constraints, a pre-release audit, work that still fails on Opus at higher effort | $10 / $50 |
-| **Opus 5.5** | You are not sure. This is the default for most real work | Features, debugging, long agentic builds, refactors | $4 / $20 |
-| **Sonnet 5.5** | The work is scoped and the instructions are clear | One module, a test file, routine review, research, docs | $2 / $10 |
-| **Haiku 5.5** | The job is high-volume, fast and easy to check | Find files, classify, extract fields, route requests | $0.10 / $0.50 for prompts up to 100K tokens |
-
-Anthropic's own guidance: *"If you're unsure which model to use, start with Claude Opus 5.5 for most workloads. Use Claude Fable 5.1 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short."* ([Models overview](https://platform.claude.com/docs/en/about-claude/models/overview)). Prices are standard Claude API list rates ([pricing](https://platform.claude.com/docs/en/about-claude/pricing)), not subscription allowances. The role assignments in this guide are editorial recommendations.
-
-## The Quartet: map, plan, build, prove
-
-Every task in this guide follows the same four moves. Each move has a default model. Skip a move when it would not change the next action.
-
-| Move | Question it answers | Default agent and model | Skip it when… |
-|---|---|---|---|
-| **Map** | Where is the relevant evidence? | `explorer` · Haiku 5.5 | You already know the files |
-| **Plan** | What is the right approach, and how will we know it worked? | `architect` · Fable 5.1 | Requirements are clear and the change is small |
-| **Build** | Make the change and run the checks | `implementer` · Opus 5.5, `worker` · Sonnet 5.5 | Never: this is the work |
-| **Prove** | Does the result meet the acceptance checks? | `reviewer` · Sonnet 5.5, `auditor` · Fable 5.1 | The change is trivial and reversible |
-
-**The rule: start in the middle, escalate on evidence.** Opus 5.5 at `medium` leads. Delegate down when the work is clear and checkable. Escalate up when the evidence (a repeated failure, conflicting sources, a costly mistake) says so.
-
-<p align="center"><img src="assets/images/orchestration.png" alt="Overhead view of a round lead desk linked to four specialist stations, with folders returning to a tray on the desk" width="560"></p>
-
-```mermaid
-flowchart LR
-    A[Define outcome and acceptance checks] --> M[Map: explorer]
-    M --> Q{Ambiguous or consequential?}
-    Q -->|Yes| P[Plan: architect]
-    Q -->|No| B[Build: implementer or workers]
-    P --> B
-    B --> R{Risk level}
-    R -->|Routine| V[Prove: reviewer]
-    R -->|High| U[Prove: auditor]
-    V --> D[Verify the real result yourself]
-    U --> D
-```
-
-## Your agent team in 60 seconds
-
-Requires [Claude Code](https://code.claude.com/docs/en/overview) **v2.1.293 or later** (the first release with Haiku 5.5). Check with `claude --version`; upgrade with `claude update`.
+Requires [Claude Code](https://code.claude.com/docs/en/overview) **v2.1.321 or later** (the first release with Fable 5.2). Check with `claude --version`; upgrade with `claude update`.
 
 **1. Install** the eight agents into your user agents folder. Settings are not touched.
 
@@ -107,46 +50,103 @@ Requires [Claude Code](https://code.claude.com/docs/en/overview) **v2.1.293 or l
 curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash
 ```
 
-Prefer to read it first? Download, inspect, then preview:
+Prefer to read it first? `curl -fsSLo install.sh <same URL>`, read it, then `bash install.sh --dry-run`.
 
-```bash
-curl -fsSLo install.sh https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh
-less install.sh
-bash install.sh --dry-run    # shows every change, writes nothing
-```
-
-**2. Open your project** and start a session:
-
-```bash
-cd your-project
-claude
-```
-
-**3. Paste this:**
+**2. Open your project** with `claude`, and **3. paste this:**
 
 ```text
-Use the explorer agent to map the code involved in [feature]. If the design
-is unclear, use the architect agent to plan it with acceptance checks. Have
-the implementer build it and run the tests, then ask the reviewer to check
-the diff against the plan. Report what changed and how it was verified.
+Task: [change]. Acceptance check: [command or behavior].
+Use the explorer agent to find the files and tests involved. If the
+approach is unclear, use the architect agent to plan it and show me the
+plan. Have the implementer build it and run the tests, returning the real
+command output. Then start the reviewer fresh with my task and the diff,
+not the implementer's summary. Wait for every report, then re-run the
+acceptance check yourself and show me the output.
 ```
 
-Run `/tasks` while it works. Claude Code shows the model each subagent is running on ([docs](https://code.claude.com/docs/en/sub-agents)).
+**4. Watch** `/tasks` while it works: it lists each subagent and its model. **5. Verify** the result yourself. [The full walkthrough](docs/start-here.md).
+
+## Six rules for a team you can trust
+
+1. **One owner per file.** Parallel writers get separate worktrees; shared files are done in sequence.
+2. **Fresh context per role.** A subagent sees only its brief. Put everything it needs in it.
+3. **Brief in, evidence out.** Every report ends with status, evidence per claim and the real output of the checks it ran. [Return contract](templates/return-contract.md).
+4. **The verifier is not the implementer.** Reviewers and auditors are fresh subagents given the original requirements and the artifact, not a summary.
+5. **Escalate on evidence.** Raise effort, then the model, after a reproduced failure, conflicting evidence or a costly consequence.
+6. **The lead re-runs the proof.** A report is a claim. The acceptance check, run after the reports arrive, is the evidence.
+
+## The guide, chapter by chapter
+
+| # | Chapter | What it answers |
+|---|---|---|
+| 0 | [Start here](docs/start-here.md) | One task end to end in ten minutes |
+| 1 | [When to delegate](docs/when-to-delegate.md) | When a subagent helps, when it doesn't, and the smallest useful team |
+| 2 | [How subagents run](docs/how-subagents-run.md) | Background by default, notifications, final-message handback, forks, `SendMessage`, resume, limits |
+| 3 | [Agent files](docs/agents.md) | The eight roles and every frontmatter field, verified |
+| 4 | [Orchestration patterns](docs/orchestration-patterns.md) | Map-then-act, fan-out, pipeline, parallel writers, three-stage audit loop, competing hypotheses |
+| 5 | [Handoff contracts](docs/handoff-contracts.md) | What goes in a brief, what comes back, what the lead re-checks |
+| 6 | [Parallel work and worktrees](docs/parallel-work-and-worktrees.md) | `isolation: worktree`, the base-branch trap, the integration step |
+| 7 | [Models and effort](docs/models-and-effort.md) · [Task selector](docs/task-selector.md) | Which model and effort for which role and task |
+| 8 | [Cost, limits and evaluation](docs/cost-and-evaluation.md) | Where tokens go, caps on depth, concurrency and spend, measuring cost per accepted result |
+| 9 | [Gates and hooks](docs/gates-and-hooks.md) | `SubagentStop` and other hooks as gates; proving a gate can fail |
+| 10 | [Failure modes](docs/failure-modes.md) | Correlated agreement, anchoring, trusted summaries, gates that can't fail, blocked pages, partial output |
+| 11 | [Recipes](docs/workflows.md) | Twelve jobs, each with a prompt and a proof line |
+| 12 | [Product surfaces and providers](docs/product-surfaces.md) | CLI, IDEs, desktop, web, Agent SDK, Bedrock, Google Cloud, Foundry |
+| 13 | [Agent teams](docs/agent-teams.md) | The experimental heavier option, and when it beats subagents |
+| 14 | [From the ChatGPT and Kimi guides](docs/from-chatgpt-and-kimi.md) | Role and lever mapping across the trilogy |
 
 ## The eight agents
 
+<p align="center"><img src="assets/images/orchestration.png" alt="Overhead view of a round lead desk linked to four specialist stations, with folders returning to a tray on the desk" width="560"></p>
+
 | Agent | Model | Effort | Tools | Job |
 |---|---|---|---|---|
-| [architect](agents/architect.md) | `claude-fable-5-1` | high | Read-only + web | Plan ambiguous or high-stakes work; return chunks and acceptance checks |
-| [implementer](agents/implementer.md) | `claude-opus-5-5` | medium | Full edit + Bash + web | Build the agreed change end to end, with tests |
-| [worker](agents/worker.md) | `claude-sonnet-5-5` | medium | Edit + Bash | Own one clearly scoped chunk; run several in parallel |
+| [architect](agents/architect.md) | `claude-fable-5-2` | high | Read-only + web | Plan ambiguous or high-stakes work; return chunks that share no files, with acceptance checks |
+| [implementer](agents/implementer.md) | `claude-opus-5-5` | medium | Full edit + Bash + web | Build the agreed change end to end, in your checkout, with tests |
+| [worker](agents/worker.md) | `claude-sonnet-5-5` | medium | Edit + Bash, own git worktree | Own one chunk; run several in parallel; commit and report the branch |
 | [explorer](agents/explorer.md) | `claude-haiku-5-5` | medium | Read, Glob, Grep | Find code fast and return paths with line numbers |
 | [reviewer](agents/reviewer.md) | `claude-sonnet-5-5` | high | Read + Bash, no edits | Routine independent review with evidence |
-| [auditor](agents/auditor.md) | `claude-fable-5-1` | high | Read + Bash, no edits | Demanding pre-merge or pre-release review |
+| [auditor](agents/auditor.md) | `claude-fable-5-2` | high | Read + Bash, no edits | Demanding review; never relies on the implementer's account |
 | [researcher](agents/researcher.md) | `claude-sonnet-5-5` | high | Read-only + web | Gather current sources and flag uncertainty |
 | [editor](agents/editor.md) | `claude-sonnet-5-5` | medium | Edit, no Bash | Turn verified material into clear writing |
 
-Each file is a standard Claude Code subagent: YAML frontmatter with `name`, `description`, `model`, `effort` and `tools`, and a system prompt body. The exact model IDs target the Anthropic API. Explicit `tools` lists also stop these agents from spawning their own subagents. Bash is a shell, not a sandbox, so "no edits" on the reviewer and auditor is an instruction, not an enforced permission. [Why each role has this model](docs/agents.md).
+None of them can spawn subagents (no `Agent` tool), so the lead owns every handoff. The worker runs with `isolation: worktree` and `maxTurns: 40`; the explorer starts without CLAUDE.md. Bash is a shell, not a sandbox, so "no edits" on the reviewer and auditor is an instruction, not an enforced permission; see [gates and hooks](docs/gates-and-hooks.md). [Every frontmatter field, verified](docs/agents.md).
+
+## Choose a model in 30 seconds
+
+<p align="center"><img src="assets/images/model-team.png" alt="Four instruments on ivory plinths: a violet armillary sphere, terracotta dividers over a model, a sage balance scale and a sky-blue hourglass" width="520"></p>
+
+| Model | Reach for it when… | Example jobs | Input / output, USD per 1M tokens |
+|---|---|---|---|
+| **Fable 5.2** | The decision is hard, ambiguous or expensive to get wrong | Architecture with conflicting constraints, a pre-release audit, work that still fails on Opus at higher effort | $8 / $40 |
+| **Opus 5.5** | You are not sure. This is the default for most real work | Features, debugging, long agentic builds, refactors | $4 / $20 |
+| **Sonnet 5.5** | The work is scoped and the instructions are clear | One module, a test file, routine review, research, docs | $2 / $10 |
+| **Haiku 5.5** | The job is high-volume, fast and easy to check | Find files, classify, extract fields, route requests | $0.10 / $0.50 for prompts up to 100K tokens |
+
+Anthropic's own guidance: *"If you're unsure which model to use, start with Claude Opus 5.5 for most workloads. Use Claude Fable 5.2 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short."* ([Models overview](https://platform.claude.com/docs/en/about-claude/models/overview)). Prices are standard Claude API list rates ([pricing](https://platform.claude.com/docs/en/about-claude/pricing)), not subscription allowances. Role assignments are this guide's recommendations. Fable 5.1, the previous Fable, remains selectable by ID; see [models and effort](docs/models-and-effort.md#if-you-cannot-run-fable-52).
+
+## Patterns at a glance
+
+```mermaid
+flowchart LR
+    A[Outcome and acceptance check] --> M[Map: explorer]
+    M --> Q{Ambiguous or consequential?}
+    Q -->|Yes| P[Plan: architect]
+    Q -->|No| B[Build]
+    P --> B
+    B -->|sequential| I[implementer in your checkout]
+    B -->|parallel, no shared files| W[workers in worktrees, lead merges]
+    I --> R{Risk}
+    W --> R
+    R -->|Routine| V[reviewer, fresh, original brief]
+    R -->|High| U[auditor, then implementer, then a new auditor]
+    V --> D[Lead re-runs the acceptance check]
+    U --> D
+```
+
+Six patterns with copy-paste prompts: [orchestration patterns](docs/orchestration-patterns.md). Twelve jobs: [recipes](docs/workflows.md).
+
+<img src="assets/images/workflow-coding.png" alt="Ivory and terracotta blocks being assembled into a modular structure, with a brass jig placing a charcoal block and a spirit level beside it" width="100%">
 
 ## Install options
 
@@ -172,79 +172,36 @@ claude plugin marketplace add dextee/claude-agent-team-guide
 claude plugin install agent-team@dextee-guides
 ```
 
-Choose one method so you do not load two copies. To remove the installer's files, run `bash install.sh --uninstall`, or without a clone `curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall`. Files you edited are kept. [Full setup, verification and rollback](SETUP.md).
+Choose one method so you do not load two copies. To remove the installer's files, run `bash install.sh --uninstall`, or without a clone `curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall`. Files you edited are kept. To pin a version, use a commit SHA ([setup](SETUP.md#what-the-installer-does)). [Full setup, verification and rollback](SETUP.md).
 
-## Choose the smallest useful team
+## Cost and limits on one screen
 
-| Situation | Suggested arrangement |
-|---|---|
-| Small, clear edit | One Opus 5.5 session. No subagents |
-| Everyday feature | Opus lead; explorer to map; reviewer to check |
-| Complex feature or migration | Opus lead; architect first; workers on separate files; auditor last |
-| Hard bug | Opus lead at `high`; explorer for evidence; architect if hypotheses compete |
-| Research decision | Opus lead; researchers split by question; editor once facts are settled |
-| Large mechanical change | Architect splits by file; several workers in parallel; reviewer on the integrated result |
-| Release gate | Auditor on the final diff; you verify the real user flow |
-
-Team sizes are hypotheses to test. Every subagent makes its own API requests, so more agents means more tokens. Anthropic recommends subagents for focused jobs where only the result matters, and notes that experimental [agent teams](https://code.claude.com/docs/en/agent-teams) "use significantly more tokens than a single session."
-
-## Recipes you can use today
-
-<img src="assets/images/workflow-coding.png" alt="Ivory and terracotta blocks being assembled into a modular structure, with a brass jig placing a charcoal block and a spirit level beside it" width="100%">
-
-The [recipe library](docs/workflows.md) has twelve copy-paste prompts: feature delivery, hard bugs, refactors, pre-merge review, security-sensitive changes, research briefs, documentation, release notes, incident triage, dependency upgrades, data reconciliation and cost reduction. Each names the lead, the team, the prompt and what "done" means.
-
-### A better delegation brief
-
-```text
-Outcome: [the result required]
-Context: [only the files, sources and decisions needed]
-Owner: [one agent, one writable area]
-Scope: [files, records or questions in and out of scope]
-Acceptance: [observable checks]
-Return: [result, evidence, unresolved issues, recommended next action]
-```
-
-A subagent starts with a fresh context. Only the prompt you pass reaches it, and only its final message comes back ([Agent SDK docs](https://code.claude.com/docs/en/agent-sdk/subagents)). Put everything the agent needs in the brief. [Template](templates/task-brief.md).
-
-## Effort: start at the default, escalate on evidence
-
-In Claude Code, Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to `medium` effort, and Fable 5.1 defaults to `high`. All four accept `low`, `medium`, `high`, `xhigh` and `max` ([model configuration](https://code.claude.com/docs/en/model-config)).
-
-| Start | Work shape | Raise it when… |
-|---|---|---|
-| `low` | One clear transformation, chat, simple lookups | A needed step or check gets skipped |
-| `medium` | Everyday building | Edge cases or dependencies keep being missed |
-| `high` | Investigation, review, hard decisions | A reproduced failure still persists |
-| `xhigh` / `max` | Long-horizon or frontier problems | A side-by-side comparison shows a better finished result |
-
-Anthropic's advice: *"Tuning effort is often a better lever than switching models"* ([choosing a model](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model)). Set effort with `/effort`, `claude --effort high`, or the `effort` field in an agent file. The `CLAUDE_CODE_EFFORT_LEVEL` environment variable overrides all of these, including agent files. [Effort details](docs/models-and-effort.md).
-
-## Keep quality and cost visible
-
-- Judge the finished task: correctness, rework, elapsed time and billed usage. A confident summary is not evidence.
-- Start with one agent when the work is short or sequential.
-- Escalate on a trigger: unclear requirements, conflicting evidence, repeated failure or a costly consequence.
-- Check `/usage` during long sessions. Subagents draw on the same plan or API budget.
+- Every subagent sends its own requests against the same plan or API budget. `/usage` attributes recent usage to subagents on subscription plans.
+- Results return into the lead's context. Ask for short, structured reports.
+- Defaults: three layers of nesting, 20 subagents running at once, no limit on the total. In the Agent SDK, cap spend with `max_budget_usd` / `maxBudgetUsd`.
+- Subagent prompt caches last five minutes by default, even on a subscription.
+- Agent teams cost the most: each teammate is a full instance.
 - **Fable may bill usage credits on some plans.** Interactive sessions ask first. In non-interactive `claude -p` runs, Claude Code does not ask ([model configuration](https://code.claude.com/docs/en/model-config)).
 
-Use the [evaluation worksheet](templates/evaluation.csv) and [cost guide](docs/cost-and-evaluation.md). API list prices and subscription limits are different measures.
+Details and sources: [cost, limits and evaluation](docs/cost-and-evaluation.md).
 
 ## Common questions
 
-**Do I need all eight agents?** No. Most tasks need one session and maybe an explorer and a reviewer. Keep the others for the tasks that need them.
+**Do I need all eight agents?** No. Most tasks need one session and maybe an explorer and a reviewer.
+
+**Why didn't Claude wait for the subagent?** Subagents spawned from the main conversation start in the background, and in interactive sessions fork mode (on by default) stops Claude waiting. The result arrives as a notification in a later turn. [How to make Claude wait](docs/how-subagents-run.md#making-claude-wait).
 
 **Does `/model` change my agents' models?** No. These agents pin their model in frontmatter, which outranks `/model` and `CLAUDE_CODE_SUBAGENT_MODEL`. Two things do override it: a model Claude passes when it spawns the agent, and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` ([subagent docs](https://code.claude.com/docs/en/sub-agents)). Check `/tasks`.
 
-**Why not Fable for everything?** It costs 2.5× Opus 5.5 per token and is slower. Anthropic positions Opus 5.5 as the starting point and Fable for demanding work. Measure whether the extra cost changes your result.
+**Why not Fable for everything?** Fable 5.2 costs twice Opus 5.5 per token. Anthropic positions Opus 5.5 as the starting point and Fable for demanding work. Measure whether the extra cost changes your result.
 
-**Why Haiku for the explorer, not the built-in Explore agent?** The built-in Explore agent generally runs on your main conversation's model (when the main model is Fable, it depends on how you connect). Pinning Haiku 5.5 makes search cheaper. Use whichever you prefer.
+**My Claude Code is older than 2.1.321, or my account has no Fable.** Run `claude update`. Otherwise change `model:` in `architect.md` and `auditor.md` to `claude-fable-5-1` (v2.1.257 or later) or `claude-opus-5-5` with `effort: high` or `xhigh`.
 
-**My account has no Fable access.** Change `model: claude-fable-5-1` to `model: claude-opus-5-5` in `architect.md` and `auditor.md`, and raise their `effort` to `high` or `xhigh` if you need more depth.
+**Workers branched from `main` instead of my branch.** That is the documented default for worktrees. Set `worktree.baseRef` to `"head"` and commit before dispatching. [Parallel work](docs/parallel-work-and-worktrees.md#branch-from-your-work-not-from-main).
 
-**I use Amazon Bedrock, Google Cloud or Microsoft Foundry.** Model aliases map to different versions there, and fast mode and the advisor are not available on those providers. Check that each pinned model is enabled for your account. [Product surfaces](docs/product-surfaces.md).
+**I use Amazon Bedrock, Google Cloud or Microsoft Foundry.** Aliases map to different versions there, and fast mode and the advisor are limited by provider. Check that each pinned model is enabled for your account. [Product surfaces](docs/product-surfaces.md).
 
-**I installed the earlier edition.** The original guide lived at `dextee/claude-code-agent-team-guide`, now the VYR showcase. This repository replaces it: Sonnet 5 → Sonnet 5.5, Haiku 4.5 → Haiku 5.5, five agents → eight. [Changelog](CHANGELOG.md).
+**I installed an earlier edition.** See the [changelog](CHANGELOG.md). 3.0.0 moves the architect and auditor to Fable 5.2, isolates the worker in a worktree, and raises the Claude Code minimum.
 
 ## Part of the Agent Team Guide trilogy
 
@@ -252,7 +209,7 @@ One role spine (architect, implementer, worker, explorer, reviewer, auditor), ad
 
 | Guide | Models covered | Agent format |
 |---|---|---|
-| **Claude Code Agent Team Guide** (this repo) | Fable 5.1 · Opus 5.5 · Sonnet 5.5 · Haiku 5.5 | Markdown subagents with pinned model and effort |
+| **Claude Code Agent Team Guide** (this repo) | Fable 5.2 · Opus 5.5 · Sonnet 5.5 · Haiku 5.5 | Markdown subagents with pinned model and effort |
 | [ChatGPT Agent Team Guide](https://github.com/dextee/chatgpt-agent-team-guide) | GPT-6 Astra · GPT-6.1 Sol · GPT-6 Luna | Codex TOML custom agents |
 | [Kimi Agent Team Guide](https://github.com/dextee/kimi-agent-team-guide) | K3 · K3 256K · K2.8 Preview · K2.7 Code HighSpeed | Kimi Code Markdown agents and a model pool |
 
@@ -266,15 +223,15 @@ The [Agent Workflow Atlas](docs/atlas/README.md) maps all 14 workflows on [VYR A
 
 This guide is free under the MIT license. VYR also scopes and builds agent workflows for businesses. Share the recurring task, current tools, monthly volume, budget range and target start date. **[See the process and send a workflow brief](WORK_WITH_VYR.md)** · [Current Agent OS status](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_business)
 
-The model recommendations are not evidence of VYR customer outcomes or an Anthropic endorsement of VYR.
+The recommendations are not evidence of VYR customer outcomes or an Anthropic endorsement of VYR.
 
 ## If this helped
 
-**Star the repository** so other teams can find it, and share the [30-second table](#choose-in-30-seconds) with whoever picks models on your team. Found something out of date? [Open an issue](https://github.com/dextee/claude-agent-team-guide/issues/new/choose) with the official source. [Contributing](CONTRIBUTING.md) · [Cite this guide](CITATION.cff)
+**Star the repository** so other teams can find it. Found something out of date? [Open an issue](https://github.com/dextee/claude-agent-team-guide/issues/new/choose) with the official source. [Contributing](CONTRIBUTING.md) · [Cite this guide](CITATION.cff)
 
 ## Sources, artwork and maintenance
 
-Every model ID, price, effort setting, frontmatter field, plugin command and CLI flag was checked against official Anthropic documentation on **15 October 2026**. See the [source register](SOURCES.md) and [validation report](VALIDATION.md). Availability varies by plan, provider and Claude Code version, and can change after that date.
+Every model ID, price, effort setting, frontmatter field, environment variable, plugin command and CLI flag was checked against official Anthropic documentation on **15 November 2026**. Model IDs, rates and minimum versions live in [templates/models.json](templates/models.json), and `scripts/validate.py` checks every page against it. See the [source register](SOURCES.md) and [validation report](VALIDATION.md). Availability varies by plan, provider and Claude Code version, and can change after that date.
 
 Illustrations are conceptual artwork, not product screenshots or measured results. [Gallery and provenance](assets/README.md).
 

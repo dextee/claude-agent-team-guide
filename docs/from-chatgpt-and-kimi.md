@@ -4,18 +4,18 @@
 
 This guide is one of three that share a role spine: architect, implementer, worker, explorer, reviewer and auditor. If you already use the [ChatGPT Agent Team Guide](https://github.com/dextee/chatgpt-agent-team-guide) or the [Kimi Agent Team Guide](https://github.com/dextee/kimi-agent-team-guide), these tables map their roles and controls onto Claude Code.
 
-The ChatGPT and Kimi columns are taken from those guides' own READMEs (checked by their authors on 6 October and 10 October 2026). The Claude column was checked on 15 October 2026. Model assignments in all three are editorial starting points. **No equivalence between vendors' models is claimed.**
+The ChatGPT and Kimi columns are taken from those guides' own READMEs and setup pages (checked by their authors on 6 October and 10 October 2026). The Codex install paths (`.codex/agents/`, `~/.codex/agents/`) and the `/agent` command come from the ChatGPT guide's SETUP.md, not its README. The Claude column was checked on 15 November 2026. Model assignments in all three are editorial starting points. **No equivalence between vendors' models is claimed.**
 
 ## Role mapping
 
 | Role | ChatGPT guide (Codex) | Kimi guide (Kimi Code) | This guide (Claude Code) |
 |---|---|---|---|
-| Architect | GPT-6 Astra / high | K3 / max | Fable 5.1 / high |
+| Architect | GPT-6 Astra / high | K3 / max | Fable 5.2 / high |
 | Implementer | GPT-6.1 Sol / medium | kimi-for-coding / high | Opus 5.5 / medium |
 | Worker | GPT-6 Luna / medium | kimi-for-coding-highspeed loop | Sonnet 5.5 / medium |
 | Explorer | GPT-6 Luna / high | kimi-for-coding / low | Haiku 5.5 / medium |
 | Reviewer | GPT-6.1 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
-| Auditor | GPT-6 Astra / high | K3 / max | Fable 5.1 / high |
+| Auditor | GPT-6 Astra / high | K3 / max | Fable 5.2 / high |
 | Researcher | GPT-6.1 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
 | Editor | GPT-6.1 Sol / medium | kimi-for-coding / low | Sonnet 5.5 / medium |
 | Visual director | GPT-6.1 Sol / medium + image tool | Not ported | Not ported; Claude models do not generate images |
@@ -34,7 +34,7 @@ The ChatGPT and Kimi columns are taken from those guides' own READMEs (checked b
 | Project install path | `.codex/agents/` | `.kimi-code/agents/` | `.claude/agents/` |
 | User install path | `~/.codex/agents/` | `~/.kimi-code/agents/` | `~/.claude/agents/` |
 | Packaged distribution | Installer script | Copy files | Installer script or plugin marketplace |
-| See which model ran | `/agent` in the CLI | See the Kimi guide | `/tasks` |
+| See which model ran | `/agent` in the CLI lets you inspect agent threads | See the Kimi guide | `/tasks` |
 | Second-opinion pattern | Delegate to the architect | Read-only reviewer agents | Experimental `/advisor`, or the auditor agent |
 | Many full sessions | Not covered | Not covered | Experimental agent teams |
 
@@ -49,3 +49,7 @@ The ChatGPT and Kimi columns are taken from those guides' own READMEs (checked b
 ## Links to update when sharing
 
 The earlier Claude guide lived at `dextee/claude-code-agent-team-guide`. That name now redirects to the [VYR Agent OS showcase](https://github.com/dextee/vyr-agent-os-workflows), and the guide content was removed there. This repository is its replacement. Link to `https://github.com/dextee/claude-agent-team-guide`.
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Product facts checked 2026-11-15 against the pages in [SOURCES.md](../SOURCES.md).*

@@ -9,7 +9,7 @@
     {
       "name": "agent-team",
       "source": "./",
-      "description": "Eight subagents pinned to the right Claude model: Fable 5.1 plans and audits, Opus 5.5 builds, Sonnet 5.5 works, reviews, researches and edits, Haiku 5.5 explores."
+      "description": "Eight subagents for running a Claude Code team: Fable 5.2 plans and audits, Opus 5.5 builds, Sonnet 5.5 works, reviews, researches and edits, Haiku 5.5 explores."
     }
   ]
 }

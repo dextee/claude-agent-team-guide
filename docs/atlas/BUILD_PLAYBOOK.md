@@ -10,13 +10,13 @@ This repository installs eight **Claude Code development agents**. They help bui
 
 | Development role | Suggested use in a workflow project |
 |---|---|
-| Architect / Fable 5.1 | Define dependencies, permissions, failure states and the smallest useful design. |
+| Architect / Fable 5.2 | Define dependencies, permissions, failure states and the smallest useful design. |
 | Implementer / Opus 5.5 | Build the orchestrator, adapters and difficult business logic. |
 | Worker / Sonnet 5.5 | Implement a bounded adapter or independently reviewable module. |
 | Explorer / Haiku 5.5 | Locate existing schemas, code paths and configuration. |
 | Researcher / Sonnet 5.5 | Collect the receiving system's current API documentation and limits. |
 | Reviewer / Sonnet 5.5 | Check each adapter against its handoff contract. |
-| Auditor / Fable 5.1 | Challenge the implementation against its requirements and failure cases. |
+| Auditor / Fable 5.2 | Challenge the implementation against its requirements and failure cases. |
 | Editor / Sonnet 5.5 | Write the operator runbook from the verified design. |
 
 These are the guide's starting recommendations, not measurements or a claim about VYR's selected models. Consult the [model guide](../models-and-effort.md) for current IDs and settings. A business runtime needs its own quality, latency, cost and permission evaluation. A telephone interface also needs voice transport and speech capabilities; choosing a text model alone does not implement a receptionist.
@@ -93,3 +93,7 @@ Completion evidence: [receiving-system receipt or explicit handoff record].
 Do not claim deployment or measured results from the prototype.
 Use the Claude Code build team to implement and independently review it.
 ```
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Workflow statuses are VYR's public descriptions, not an independent audit.*

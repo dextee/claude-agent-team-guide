@@ -8,7 +8,7 @@ The concrete result and who will use it.
 
 ## Context
 
-The files, sources, base commit, definitions and earlier decisions it needs. Paste paths and error messages; do not assume it can see the main conversation.
+The files, sources, base commit SHA, definitions and earlier decisions it needs. Paste paths and error messages; do not assume it can see the main conversation. If a CLAUDE.md rule must reach it and it starts without CLAUDE.md, restate the rule here.
 
 ## Owner and scope
 
@@ -24,4 +24,8 @@ Observable evidence that would prove the task is done.
 
 ## Return
 
-The result, the evidence, the checks run, unresolved issues and the recommended next action.
+Use the [return contract](return-contract.md): STATUS, RESULT, EVIDENCE, CHECKS RUN with copied output, NOT CHECKED, CHANGED, OPEN.
+
+## For verifiers only
+
+Give a reviewer or auditor the original requirements and the artifact (diff, document, data), not the implementer's summary of its work.

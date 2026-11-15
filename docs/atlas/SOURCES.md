@@ -1,6 +1,6 @@
 # Source register
 
-Detail pages checked **27 September 2026**. The overview's 14 cards and their LIVE / DEMO / BUILT FOR YOU labels were rechecked on **15 October 2026** and were unchanged, including the note that shared memory is build-to-order and not wired into the three live pipelines. Scope: all 14 workflow cards on [VYR Agent OS](https://vyrwork.com/agent-os) and their individual detail pages. These are VYR's public descriptions, not an independent production audit.
+Detail pages checked **27 September 2026**. The overview's 14 cards and their LIVE / DEMO / BUILT FOR YOU labels were rechecked on **15 October 2026** and again on **15 November 2026** and were unchanged, including the note that shared memory is build-to-order and not wired into the three live pipelines, the 11-agent content pipeline and its paused new generation. Detail pages were not rechecked in November. Scope: all 14 workflow cards on [VYR Agent OS](https://vyrwork.com/agent-os) and their individual detail pages. These are VYR's public descriptions, not an independent production audit.
 
 | Use case | Primary page | Status | Preserved boundary |
 |---|---|---|---|
@@ -26,3 +26,7 @@ The overview establishes the catalogue and maturity labels. Detail pages supply 
 Educational additions are explicitly labelled: agent role names, decomposition into parallel work, handoff contracts, hypothetical examples, evaluation criteria and model recommendations. They should be validated against the actual implementation before use in a deployment claim.
 
 The source pages distinguish preparation, approval, external execution and verification. This atlas preserves those distinctions. It does not turn a draft into a sent message, a scheduled post into a delivered post, an invoice draft into a payment, or a prepared evidence pack into certification.
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Workflow statuses are VYR's public descriptions, not an independent audit.*

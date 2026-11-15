@@ -2,60 +2,56 @@
 
 [Home](README.md) · [Sources](SOURCES.md)
 
-Verification date: **2026-10-15**.
+Verification date: **2026-11-15** (guide 3.0.0).
 
 ## Automated local checks
 
 | Command | What it checks |
 |---|---|
-| `python3 scripts/validate.py` | Every local Markdown link, image and heading anchor; alt text on images; the eight required illustrations and the 1280 × 640 social preview; agent frontmatter (`name`, `description`, `model`, `effort`, `tools`) against current model IDs and effort levels; that `agents/` holds exactly the eight agents; the README agent table and the docs/agents.md roster against the files; the Claude Code minimum version across the installer and docs; installer agent list; published rates across three documents and the cost arithmetic; 24 selector rows and 12 recipes; docs breadcrumbs; JSON validity; plugin and citation versions; VYR campaign tags; leftover markers, hype words, credential patterns and unexpected email addresses |
-| `python3 scripts/test_validate.py` | 19 regression tests that alter rates, totals, token counts, agent fields, the roster, version statements and text to confirm the validator rejects each inconsistency |
-| `python3 scripts/test_installer.py` | 14 installer tests in temporary folders: dry run writes nothing, including over existing agents and settings; default install leaves settings alone; repeat install is a no-op; settings merge keeps existing values; `--force` replaces only preset keys; invalid JSON stops the merge; project install backs up a changed agent; symlinked files and folders are refused; uninstall keeps edited files; uninstall still works after a release change, using the manifest; the `curl \| bash` path, with a stub `curl` that copies local files |
+| `python3 scripts/validate.py` | Every local Markdown link, image and heading anchor; alt text on images; the eight required illustrations and the 1280 × 640 social preview; agent frontmatter, parsed by a strict line parser and, when PyYAML is installed, by `yaml.safe_load` as a cross-check (field names against the official reference, `name` rules, model IDs against `templates/models.json`, effort, colour, `isolation`, `maxTurns`, booleans); that `agents/` holds exactly the eight agents; the README agent table and the docs/agents.md roster against the files; the installer's `MIN_VERSION` against the highest minimum among the pinned models in `templates/models.json`, and every stated team minimum against the installer; rates in three documents and the cost arithmetic against `templates/models.json`; 24 selector rows; 12 recipes and 6 patterns, each with a copy-paste prompt and a "What proves it worked" line; docs breadcrumbs, the independent-guide footer and its check date; download URLs that pin a tag instead of `main` or a commit SHA; Claude model names not listed in `templates/models.json`; JSON validity; plugin, citation and changelog versions; VYR campaign tags; leftover markers, hype words, credential patterns and unexpected email addresses |
+| `python3 scripts/test_validate.py` | 39 regression tests. Each validator check is fed a broken input (wrong rate, previous Fable ID, misspelled field, bad value, invalid YAML, tag ref, invented model name, missing footer, stale date, recipe without a proof line, pattern without a prompt) and must report it. Also runs the example `SubagentStop` gate both ways (needs `jq`) |
+| `python3 scripts/test_installer.py` | 14 installer tests in temporary folders: dry run writes nothing; default install leaves settings alone; repeat install is a no-op; settings merge keeps existing values; `--force` replaces only preset keys; invalid JSON stops the merge; project install backs up a changed agent; symlinked files and folders are refused; uninstall keeps edited files and still works after a release change; the `curl \| bash` path |
 | `bash -n install.sh` | Installer syntax |
-| `claude plugin validate . --strict` | Marketplace and plugin manifests, using Claude Code 2.1.300 |
+| `claude plugin validate . --strict` and `claude plugin validate ./agents` | Marketplace manifest and agent files, with the locally installed Claude Code |
 
-The same checks, except the Claude CLI one, run in the GitHub Actions workflow at [.github/workflows/validate.yml](.github/workflows/validate.yml) after publishing.
+The same checks, except the Claude CLI ones, run in the GitHub Actions workflow at [.github/workflows/validate.yml](.github/workflows/validate.yml).
 
-## Results on 2026-10-15
+## Results on 2026-11-15
 
 | Check | Result |
 |---|---|
-| `scripts/test_validate.py` | 19 tests passed |
+| `scripts/validate.py` | PASS: 54 Markdown files, 367 local links and anchors, 19 image references, 8 agents (line and PyYAML parse), minimum version 2.1.321 |
+| `scripts/test_validate.py` | 39 tests passed |
 | `scripts/test_installer.py` | 14 tests passed |
 | `bash -n install.sh` | Passed |
-| `bash install.sh --dry-run` in an empty config folder | Listed eight additions; wrote nothing |
-| `claude plugin validate . --strict` | Validation passed |
-| Local plugin install in an isolated config folder | `claude plugin details agent-team` listed `Agents (8)`; about 415 always-on tokens |
-| `scripts/validate.py` (strict, with all illustrations present) | Passed |
+| `bash install.sh --dry-run` with an empty `HOME` | Listed eight additions; wrote nothing; warned that the local Claude Code 2.1.284 is below 2.1.321 |
+| `claude plugin validate . --strict` (Claude Code 2.1.284) | Validation passed |
+| `claude plugin validate ./agents` (Claude Code 2.1.284) | Validation passed |
+| Mutation test of each new validator check, on a copy of the repository | Each of 15 deliberate breakages failed the validator with a message naming the problem; each restore passed |
+| Example `SubagentStop` gate | Exit 2 on a report without the return contract, exit 0 with it, exit 0 when `stop_hook_active` is true |
 
-## Independent agent review
+## Review record, 15 November 2026
 
-On 15 October 2026 a separate Claude subagent running Fable 5.1 audited the repository read-only. It spot-checked minimum versions, effort defaults, the subagent model order, agent precedence, `-p` billing, advisor pairings and the cost arithmetic against code.claude.com and found them correct. Its findings that were fixed:
+A read-only audit of 2.0.0 found that the guide taught model selection well but not how to run a team of subagents, and that several product facts had moved since 15 October: Fable 5.2 had replaced Fable 5.1 as the Fable the models overview recommends; advisor and fast-mode availability had changed; the `effortLevel` fallback no longer applied to newer models from user settings; a pinned-install example used a tag that does not exist. 3.0.0 restructures the guide around orchestration and corrects each fact against the pages in the [source register](SOURCES.md). The audit confirmed that Haiku 5.5 and the existing rates, cost figures and frontmatter fields were correct; those were kept.
 
-- Recipes asked the explorer, which has no shell, to read git history and logs. The lead now runs those commands.
-- `--uninstall` compared files only with the current release, so it would have kept every file after a future release. The installer now writes a hash manifest and uninstalls against it; the `curl | bash -s -- --uninstall` form is documented.
-- The installer body is wrapped in `main()` so a truncated download cannot run partially, child processes get `/dev/null` as stdin, and the settings write uses a private temp file.
-- A contradiction about multi-hour runs (Fable in the README, Opus in the selector), a static "passing" badge, a "read first" step that did not read anything, the advisor consent side effect, a missing fallback for accounts without Fable, the effort precedence table and missing validator cross-checks.
+This is an AI-assisted review with reproducible checks, not a third-party or human audit. A separate verification pass is expected before release.
 
-Adding a test for the `curl | bash` path then exposed one more bug: the cleanup trap referenced a variable local to `main()`, so every piped install exited with status 1 under `set -u`. It is fixed and covered by that test.
+## Earlier review, 15 October 2026
 
-This is an AI-assisted review with reproducible checks, not a third-party or human security audit.
-
-## Source review
-
-Every model ID, price, effort level and default, frontmatter field, plugin and marketplace command, CLI flag and environment variable in this guide was checked against the official pages listed in the [source register](SOURCES.md) on 15 October 2026. Statements that could not be confirmed were removed or are marked as inference.
+A separate Claude subagent running Fable 5.1 audited 2.0.0 read-only. Its fixed findings included recipes that asked the shell-less explorer to run git, an uninstall that ignored earlier releases, installer robustness for `curl | bash`, and missing validator cross-checks. Adding a test for the `curl | bash` path then exposed a cleanup-trap bug under `set -u`, which was fixed and is covered by that test.
 
 ## What these checks do not establish
 
-- **No live model runs.** No agent was executed against a model. The checks prove file structure, configuration consistency and installer behavior, not that your account can run each model or that a role assignment improves your results.
-- **No benchmarks.** Model-to-role assignments are recommendations. The cost table is arithmetic on a hypothetical request. The evaluation worksheet is empty for your own results.
-- **Not a security audit.** The installer was reviewed and tested for safe file handling, but this is not a third-party or human security audit.
+- **No live model runs.** No agent was executed against a model, and the 3.0.0 agents were not exercised in a Claude Code session at v2.1.321 or later (the verification host ran 2.1.284). The checks prove file structure, configuration consistency and installer behavior, not that your account can run each model or that a team design improves your results.
+- **No benchmarks.** Model-to-role assignments, team shapes and `maxTurns: 40` are recommendations. The cost table is arithmetic on a hypothetical request. The evaluation worksheet is empty for your own results.
+- **Not a security audit.** The installer and the hook example were reviewed and tested for safe file handling, but this is not a third-party or human security audit.
 - **Point in time.** Model availability, prices and Claude Code behavior can change after the verification date.
 
-Reproduce the checks with Python 3.10 or later:
+Reproduce the checks with Python 3.10 or later (PyYAML optional, `jq` for the hook test):
 
 ```bash
 python3 scripts/validate.py
 python3 scripts/test_validate.py
 python3 scripts/test_installer.py
+bash -n install.sh
 ```

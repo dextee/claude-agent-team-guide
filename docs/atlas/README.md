@@ -2,7 +2,7 @@
 
 **14 concrete goals. Specialised agents. Visible handoffs. Human-owned decisions.**
 
-A companion to the [Claude Code Agent Team Guide](../../README.md), grounded in every workflow listed on [VYR Agent OS](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=atlas). Detail pages checked **27 September 2026**; the overview's 14 cards and their status labels rechecked **15 October 2026**.
+A companion to the [Claude Code Agent Team Guide](../../README.md), grounded in every workflow listed on [VYR Agent OS](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=atlas). Detail pages checked **27 September 2026**; the overview's 14 cards and their status labels rechecked **15 November 2026** (3 LIVE, 1 DEMO, 10 BUILT FOR YOU, unchanged). Agent counts and pipeline states below are VYR's own public claims as of those dates.
 
 Start with the [AI Receptionist](ai-receptionist.md): a concierge coordinates knowledge, availability and booking agents, while unsupported requests go to staff with their context intact.
 
@@ -45,3 +45,7 @@ VYR's proposed cross-workflow shared-memory layer is **build-to-order and not wi
 ## Using the atlas
 
 Each case includes a goal, trigger, collaboration diagram, input/output contracts, human decision, completion condition, fictional worked example and evaluation ideas. Read the [build playbook](BUILD_PLAYBOOK.md) to translate a case into an implementation brief. See the [source register](SOURCES.md) for all 14 original workflow pages.
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Workflow statuses are VYR's public descriptions, not an independent audit.*

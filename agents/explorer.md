@@ -1,9 +1,10 @@
 ---
 name: explorer
-description: Fast, low-cost codebase search. Use to find where something is defined or used, map the files involved in a feature, or summarize how a module fits together. Read-only.
+description: Fast, low-cost codebase search. Use to find where something is defined or used, map the files involved in a feature, or summarize how a module fits together. Read-only. Starts without CLAUDE.md, so put any path rules in the request.
 model: claude-haiku-5-5
 effort: medium
 tools: Read, Glob, Grep
+omitClaudeMd: true
 color: cyan
 ---
 

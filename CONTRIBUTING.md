@@ -7,12 +7,13 @@ Claude models, prices and Claude Code features change often, so source-backed co
 Open an issue with the **Outdated information** template, or a pull request that:
 
 - names the affected file and passage;
-- links the official source (platform.claude.com, code.claude.com, support.claude.com, anthropic.com or github.com/anthropics); and
+- links the official source (platform.claude.com, code.claude.com, support.claude.com, anthropic.com or github.com/anthropics);
+- updates `templates/models.json` when the fact is a model ID, rate, effort default or minimum version; and
 - states the date you checked it.
 
 ## New agents, tasks or recipes
 
-Explain the task boundary, the model and effort you chose, the escalation trigger, and the observable check that proves the task is done. Keep each agent to one job, the cheapest model that does it well, and only the tools it needs. See [docs/agents.md](docs/agents.md#write-your-own).
+Explain the task boundary, the model and effort you chose, the escalation trigger, and the observable check that proves the task is done. A new recipe or pattern needs a copy-paste prompt and a `**What proves it worked:**` line. A new frontmatter field needs a link to the official subagent reference. Keep each agent to one job, the cheapest model that does it well, and only the tools it needs. See [docs/agents.md](docs/agents.md#write-your-own).
 
 Do not present one good run as a benchmark. If you propose a measured claim, include representative cases and the failures.
 
@@ -22,6 +23,7 @@ Do not present one good run as a benchmark. If you propose a measured claim, inc
 python3 scripts/validate.py
 python3 scripts/test_validate.py
 python3 scripts/test_installer.py   # if you changed install.sh
+bash -n install.sh
 ```
 
 These checks use temporary folders and never call a Claude model. Say separately whether you tested the change in a real Claude Code session.

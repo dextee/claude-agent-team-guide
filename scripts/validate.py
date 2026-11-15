@@ -2,9 +2,12 @@
 """Static checks for the Claude Code Agent Team Guide.
 
 Checks internal links and heading anchors, image references and files,
-agent frontmatter, README/agent agreement, published rates and cost
-arithmetic, counted artifacts, leftover markers, hype words, credential
-patterns and email addresses. Read-only; never calls a model or the network.
+agent frontmatter (field names, values, and a PyYAML cross-parse when PyYAML
+is installed), README/agent agreement, model IDs, rates, minimum versions and
+cost arithmetic against templates/models.json, model names, pinned download
+URLs, docs footers and check dates, recipe and pattern structure, leftover
+markers, hype words, credential patterns and email addresses. Read-only;
+never calls a model or the network.
 
 Usage:
     python3 scripts/validate.py                  # strict (use before publishing)
@@ -20,19 +23,43 @@ from decimal import Decimal
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+try:  # Optional: a second, independent parse of agent frontmatter.
+    import yaml  # type: ignore
+except ImportError:  # pragma: no cover - depends on the environment
+    yaml = None
+
 ROOT = Path(__file__).resolve().parents[1]
+MODELS_FILE = ROOT / 'templates' / 'models.json'
+
+
+def load_models(path: Path = MODELS_FILE) -> dict:
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+MODEL_DATA = load_models()
+CHECKED_ON = MODEL_DATA['checked_on']
+CURRENT = {m['id']: m for m in MODEL_DATA['current']}
+OLDER = {m['id']: m for m in MODEL_DATA['older']}
+MODELS = {k: v['name'] for k, v in CURRENT.items()}           # ID -> display name
+KNOWN_MODEL_NAMES = ({m['name'] for m in MODEL_DATA['current']} | {m['name'] for m in MODEL_DATA['older']}
+                     | set(MODEL_DATA['other_known_names']))
+EFFORTS = set(MODEL_DATA['effort_levels'])
+NAME_ALT = '|'.join(re.escape(n) for n in MODELS.values())
 
 AGENT_NAMES = ['architect', 'implementer', 'worker', 'explorer',
                'reviewer', 'auditor', 'researcher', 'editor']
-MODELS = {
-    'claude-fable-5-1': 'Fable 5.1',
-    'claude-opus-5-5': 'Opus 5.5',
-    'claude-sonnet-5-5': 'Sonnet 5.5',
-    'claude-haiku-5-5': 'Haiku 5.5',
-}
-EFFORTS = {'low', 'medium', 'high', 'xhigh', 'max'}
 KNOWN_TOOLS = {'Read', 'Edit', 'Write', 'Glob', 'Grep', 'Bash', 'WebFetch', 'WebSearch',
                'Agent', 'NotebookEdit', 'TodoWrite'}
+# Every frontmatter field in the official subagent reference
+# (https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields, checked 2026-11-15).
+# Claude Code silently ignores a field it does not recognize, so a typo here is a real defect.
+FRONTMATTER_FIELDS = {'name', 'description', 'tools', 'disallowedTools', 'model', 'permissionMode',
+                      'maxTurns', 'autoCompactWindow', 'skills', 'mcpServers', 'hooks', 'memory',
+                      'background', 'omitClaudeMd', 'effort', 'isolation', 'color', 'initialPrompt',
+                      'experimental'}
+COLORS = {'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'}
+PERMISSION_MODES = {'default', 'manual', 'acceptEdits', 'auto', 'dontAsk', 'bypassPermissions', 'plan'}
+MEMORY_SCOPES = {'user', 'project', 'local'}
 REQUIRED_IMAGES = [
     'assets/images/hero.png', 'assets/images/model-team.png', 'assets/images/orchestration.png',
     'assets/images/workflow-coding.png', 'assets/images/workflow-research.png',
@@ -42,6 +69,12 @@ REQUIRED_IMAGES = [
 SOCIAL_PREVIEW = 'assets/social-preview.png'
 EXPECTED_TASKS = 24
 EXPECTED_RECIPES = 12
+EXPECTED_PATTERNS = 6
+REPO = 'dextee/claude-agent-team-guide'
+PROOF_LINE = '**What proves it worked:**'
+DISCLAIMER = 'Independent guide, not an Anthropic publication'
+# Pages left untouched pending an owner decision. They are reported, not failed.
+FOOTER_EXEMPT = {'docs/atlas/compliance-evidence.md'}
 ALLOWED_EMAILS = {'dextee@users.noreply.github.com', 'noreply@anthropic.com'}
 # Built from parts so this file does not trip its own marker check.
 MARKERS = ['TO' + 'DO', 'FIX' + 'ME', 'TB' + 'D', 'XX' + 'X', 'lorem ' + 'ipsum']
@@ -96,21 +129,34 @@ def png_size(path: Path) -> tuple[int, int] | None:
     return struct.unpack('>II', raw[16:24])
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str] | None, str]:
+def split_frontmatter(text: str) -> tuple[str | None, str]:
     if not text.startswith('---\n'):
         return None, text
     end = text.find('\n---\n', 4)
     if end == -1:
         return None, text
+    return text[4:end], text[end + 5:]
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, str] | None, str]:
+    """Strict flat parser: every line must be `key: value`. Nested YAML is rejected on purpose,
+    so the guide's own agents stay readable without a YAML library."""
+    raw, body = split_frontmatter(text)
+    if raw is None:
+        return None, text
     data = {}
-    for line in text[4:end].splitlines():
+    for line in raw.splitlines():
         if not line.strip():
             continue
         m = re.match(r'^([A-Za-z][\w-]*):\s*(.*)$', line)
         if not m:
             return None, text
         data[m.group(1)] = m.group(2).strip()
-    return data, text[end + 5:]
+    return data, body
+
+
+def version_tuple(v: str) -> tuple[int, ...]:
+    return tuple(int(x) for x in v.split('.'))
 
 
 def money(value: str) -> Decimal:
@@ -127,14 +173,31 @@ def check_agent(text: str, stem: str) -> list[str]:
     for key in ('name', 'description', 'model', 'tools', 'effort'):
         if not fm.get(key):
             errors.append(f'{stem}: missing frontmatter field "{key}"')
-    if fm.get('name') and fm['name'] != stem:
-        errors.append(f'{stem}: name "{fm["name"]}" does not match file name')
-    if fm.get('name') and ':' in fm['name']:
-        errors.append(f'{stem}: name cannot contain ":"')
+    for key in fm:
+        if key not in FRONTMATTER_FIELDS:
+            errors.append(f'{stem}: "{key}" is not a documented frontmatter field (Claude Code would ignore it)')
+    name = fm.get('name', '')
+    if name and name != stem:
+        errors.append(f'{stem}: name "{name}" does not match file name')
+    if name and (':' in name or name.startswith('-') or len(name) > 256):
+        errors.append(f'{stem}: name cannot contain ":", start with "-" or exceed 256 characters')
     if fm.get('model') and fm['model'] not in MODELS:
-        errors.append(f'{stem}: model "{fm["model"]}" is not a current model ID')
+        errors.append(f'{stem}: model "{fm["model"]}" is not a current model ID in templates/models.json')
     if fm.get('effort') and fm['effort'] not in EFFORTS:
         errors.append(f'{stem}: effort "{fm["effort"]}" is not a valid level')
+    if 'color' in fm and fm['color'] not in COLORS:
+        errors.append(f'{stem}: color "{fm["color"]}" is not one of {sorted(COLORS)}')
+    if 'isolation' in fm and fm['isolation'] != 'worktree':
+        errors.append(f'{stem}: isolation must be "worktree"')
+    if 'maxTurns' in fm and not re.fullmatch(r'[1-9]\d*', fm['maxTurns']):
+        errors.append(f'{stem}: maxTurns must be a positive whole number')
+    for key in ('omitClaudeMd', 'background'):
+        if key in fm and fm[key] not in ('true', 'false'):
+            errors.append(f'{stem}: {key} must be true or false')
+    if 'permissionMode' in fm and fm['permissionMode'] not in PERMISSION_MODES:
+        errors.append(f'{stem}: permissionMode "{fm["permissionMode"]}" is not a documented mode')
+    if 'memory' in fm and fm['memory'] not in MEMORY_SCOPES:
+        errors.append(f'{stem}: memory must be user, project or local')
     if fm.get('tools'):
         tools = [t.strip() for t in fm['tools'].split(',')]
         unknown = [t for t in tools if t not in KNOWN_TOOLS]
@@ -144,12 +207,39 @@ def check_agent(text: str, stem: str) -> list[str]:
             errors.append(f'{stem}: guide agents must not spawn subagents (remove Agent)')
     if 'final message' not in body.lower():
         errors.append(f'{stem}: body must say its final message is the handoff')
+    errors.extend(check_agent_yaml(text, stem, fm))
+    return errors
+
+
+def check_agent_yaml(text: str, stem: str, flat: dict[str, str]) -> list[str]:
+    """Cross-check with PyYAML, the parser family Claude Code's YAML frontmatter follows.
+    Skipped (not failed) when PyYAML is not installed."""
+    if yaml is None:
+        return []
+    raw, _ = split_frontmatter(text)
+    try:
+        data = yaml.safe_load(raw)
+    except yaml.YAMLError as e:
+        return [f'{stem}: frontmatter is not valid YAML ({e.__class__.__name__})']
+    if not isinstance(data, dict):
+        return [f'{stem}: frontmatter is not a YAML mapping']
+    errors = []
+    if set(data) != set(flat):
+        errors.append(f'{stem}: YAML keys {sorted(data)} differ from line keys {sorted(flat)}')
+    if 'maxTurns' in data and (not isinstance(data['maxTurns'], int) or isinstance(data['maxTurns'], bool)):
+        errors.append(f'{stem}: maxTurns does not parse as an integer')
+    for key in ('omitClaudeMd', 'background'):
+        if key in data and not isinstance(data[key], bool):
+            errors.append(f'{stem}: {key} does not parse as a boolean')
+    for key in ('name', 'description', 'model', 'effort', 'tools', 'color', 'isolation'):
+        if key in data and not isinstance(data[key], str):
+            errors.append(f'{stem}: {key} does not parse as a string')
     return errors
 
 
 def parse_rates(models_text: str) -> dict[str, tuple[Decimal, Decimal, Decimal]]:
     rates = {}
-    for m in re.finditer(r'^\| `(claude-[\w-]+)` \| (\$[\d.]+) \| (\$[\d.]+) \| (\$[\d.]+) \|$',
+    for m in re.finditer(r'^\| `(claude-[\w-]+)` \| (\$[\d.]+) \| (\$[\d.]+) \| (\$[\d.]+) \|',
                          models_text, re.M):
         if m.group(1) in rates:
             raise ValueError(f'duplicate rate row for {m.group(1)}')
@@ -157,15 +247,31 @@ def parse_rates(models_text: str) -> dict[str, tuple[Decimal, Decimal, Decimal]]
     return rates
 
 
-def check_rates_and_costs(models_text: str, cost_text: str, readme_text: str) -> list[str]:
+def json_rates(entry: dict) -> tuple[Decimal, Decimal, Decimal]:
+    return (Decimal(entry['input_usd_per_mtok']), Decimal(entry['cache_read_usd_per_mtok']),
+            Decimal(entry['output_usd_per_mtok']))
+
+
+def check_rates_and_costs(models_text: str, cost_text: str, readme_text: str,
+                          data: dict | None = None) -> list[str]:
+    """Rates in the docs must equal templates/models.json, and the cost arithmetic must add up."""
+    data = data or MODEL_DATA
+    current = {m['id']: m for m in data['current']}
+    names = {m['name']: m for m in data['current']}
+    name_alt = '|'.join(re.escape(n) for n in names)
     errors = []
     try:
         rates = parse_rates(models_text)
     except ValueError as e:
         return [f'models-and-effort: {e}']
-    if set(rates) != set(MODELS):
-        errors.append(f'models-and-effort: expected one rate row per model, found {sorted(rates)}')
-    by_name = {MODELS[k]: v for k, v in rates.items() if k in MODELS}
+    for model_id, entry in current.items():
+        if model_id not in rates:
+            errors.append(f'models-and-effort: no rate row for {model_id}')
+        elif rates[model_id] != json_rates(entry):
+            errors.append(f'models-and-effort: {model_id} rates differ from templates/models.json')
+    for model_id in rates:
+        if model_id not in current:
+            errors.append(f'models-and-effort: rate row for {model_id}, which is not a current model')
 
     prose = re.search(r'\*\*([\d,]+) uncached input tokens and ([\d,]+) billable output tokens\*\*',
                       cost_text)
@@ -173,28 +279,28 @@ def check_rates_and_costs(models_text: str, cost_text: str, readme_text: str) ->
         errors.append('cost-and-evaluation: example token counts not found in prose')
         return errors
     tin, tout = int(prose.group(1).replace(',', '')), int(prose.group(2).replace(',', ''))
-    rows = re.findall(r'^\| (Fable 5\.1|Opus 5\.5|Sonnet 5\.5|Haiku 5\.5) \| ([\d,]+) / 1M × (\$[\d.]+) \| '
+    rows = re.findall(rf'^\| ({name_alt}) \| ([\d,]+) / 1M × (\$[\d.]+) \| '
                       r'([\d,]+) / 1M × (\$[\d.]+) \| (\$[\d.]+) \|$', cost_text, re.M)
-    if len(rows) != 4:
-        errors.append(f'cost-and-evaluation: expected 4 arithmetic rows, found {len(rows)}')
+    if len(rows) != len(names):
+        errors.append(f'cost-and-evaluation: expected {len(names)} arithmetic rows, found {len(rows)}')
     for name, rin, pin, rout, pout, total in rows:
         if int(rin.replace(',', '')) != tin or int(rout.replace(',', '')) != tout:
             errors.append(f'cost-and-evaluation: {name} token counts differ from the prose')
-        if name in by_name:
-            exp_in, _, exp_out = by_name[name]
-            if money(pin) != exp_in or money(pout) != exp_out:
-                errors.append(f'cost-and-evaluation: {name} rates differ from models-and-effort')
+        exp_in, _, exp_out = json_rates(names[name])
+        if money(pin) != exp_in or money(pout) != exp_out:
+            errors.append(f'cost-and-evaluation: {name} rates differ from templates/models.json')
         computed = (Decimal(tin) * money(pin) + Decimal(tout) * money(pout)) / Decimal(1_000_000)
         if computed.quantize(Decimal('0.001')) != money(total):
             errors.append(f'cost-and-evaluation: {name} displayed total {total} != computed {computed}')
 
-    readme_rows = re.findall(r'^\| \*\*(Fable 5\.1|Opus 5\.5|Sonnet 5\.5|Haiku 5\.5)\*\* \|.*?\| '
+    readme_rows = re.findall(rf'^\| \*\*({name_alt})\*\* \|.*?\| '
                              r'(\$[\d.]+) / (\$[\d.]+)[^|]*\|$', readme_text, re.M)
-    if len(readme_rows) != 4:
-        errors.append(f'README: expected 4 rows with prices in the 30-second table, found {len(readme_rows)}')
+    if len(readme_rows) != len(names):
+        errors.append(f'README: expected {len(names)} rows with prices in the 30-second table, found {len(readme_rows)}')
     for name, pin, pout in readme_rows:
-        if name in by_name and (money(pin) != by_name[name][0] or money(pout) != by_name[name][2]):
-            errors.append(f'README: {name} price differs from models-and-effort')
+        exp_in, _, exp_out = json_rates(names[name])
+        if money(pin) != exp_in or money(pout) != exp_out:
+            errors.append(f'README: {name} price differs from templates/models.json')
     return errors
 
 
@@ -213,7 +319,7 @@ def check_readme_agents(readme_text: str, agents: dict[str, dict[str, str]]) -> 
 def check_agents_doc(doc_text: str, agents: dict[str, dict[str, str]]) -> list[str]:
     """docs/agents.md roster: model / effort and tools must match each file."""
     errors = []
-    rows = re.findall(r'^\| \[(\w+)\]\(\.\./agents/\1\.md\) \| (Fable 5\.1|Opus 5\.5|Sonnet 5\.5|Haiku 5\.5) / (\w+) \| ([^|]+) \|',
+    rows = re.findall(rf'^\| \[(\w+)\]\(\.\./agents/\1\.md\) \| ({NAME_ALT}) / (\w+) \| ([^|]+) \|',
                       doc_text, re.M)
     if sorted(r[0] for r in rows) != sorted(AGENT_NAMES):
         errors.append(f'docs/agents.md: roster rows {sorted(r[0] for r in rows)} != agent files')
@@ -226,6 +332,14 @@ def check_agents_doc(doc_text: str, agents: dict[str, dict[str, str]]) -> list[s
     return errors
 
 
+def team_min_version(agents: dict[str, dict[str, str]], data: dict | None = None) -> str | None:
+    """The team's Claude Code minimum is the highest minimum among the models the agents pin."""
+    data = data or MODEL_DATA
+    mins = {m['id']: m['min_claude_code'] for m in data['current']}
+    found = [mins[fm['model']] for fm in agents.values() if fm.get('model') in mins]
+    return max(found, key=version_tuple) if found else None
+
+
 def check_min_version(texts: dict[str, str], version: str) -> list[str]:
     """Every stated Claude Code minimum for the team must equal the installer's."""
     errors = []
@@ -233,6 +347,57 @@ def check_min_version(texts: dict[str, str], version: str) -> list[str]:
         for found in re.findall(r'(?:Claude_Code-|[Vv]ersion v|Claude Code(?:\]\([^)]*\))?\*{0,2} \*{0,2}v?)(2\.1\.\d+)(?:%2B|\+|\*{0,2} or later)', text):
             if found != version:
                 errors.append(f'{label}: states minimum {found}, installer requires {version}')
+    return errors
+
+
+def check_raw_refs(text: str, label: str) -> list[str]:
+    """A download URL for this repository must name main or a full commit SHA. The repository
+    has no tags, so a tag ref would 404 (a v2.0.0 example did)."""
+    errors = []
+    for ref in re.findall(rf'raw\.githubusercontent\.com/{re.escape(REPO)}/([^/\s"\'`)]+)/', text):
+        if ref == 'main' or re.fullmatch(r'[0-9a-f]{40}', ref) or ref in ('<commit-sha>', '${REF}', '$SHA', '${SHA}'):
+            continue
+        errors.append(f'{label}: raw.githubusercontent.com ref "{ref}" is not main or a 40-character commit SHA')
+    return errors
+
+
+def check_model_names(text: str, label: str, known: set[str] | None = None) -> list[str]:
+    """Every Claude model name the guide mentions must be one listed in templates/models.json.
+    Catches invented versions, the standing risk in a model guide."""
+    known = known or KNOWN_MODEL_NAMES
+    errors = []
+    for family, version in re.findall(r'\b(Fable|Opus|Sonnet|Haiku)[ -](\d+(?:\.\d+)?)\b', text):
+        if f'{family} {version}' not in known:
+            errors.append(f'{label}: unknown model name "{family} {version}"')
+    return errors
+
+
+def check_docs_footer(text: str, label: str, checked_on: str, require_date: bool) -> list[str]:
+    lines = [l for l in text.splitlines() if l.strip()]
+    last = lines[-1] if lines else ''
+    errors = []
+    if DISCLAIMER not in last:
+        errors.append(f'{label}: last line must carry the independent-guide footer')
+    elif require_date and f'checked {checked_on}' not in last:
+        errors.append(f'{label}: footer must state "checked {checked_on}" (templates/models.json checked_on)')
+    return errors
+
+
+def check_sections(text: str, label: str, heading_re: str, expected: int) -> list[str]:
+    """Each numbered section needs a copy-paste ```text prompt and a proof line."""
+    errors = []
+    parts = re.split(rf'^(?={heading_re})', text, flags=re.M)[1:]
+    numbers = []
+    for part in parts:
+        m = re.match(heading_re + r'(\d+)', part)
+        numbers.append(int(m.group(1)) if m else -1)
+        title = part.splitlines()[0]
+        if '```text' not in part:
+            errors.append(f'{label}: "{title}" has no ```text copy-paste prompt')
+        if PROOF_LINE not in part:
+            errors.append(f'{label}: "{title}" has no "{PROOF_LINE}" line')
+    if numbers != list(range(1, expected + 1)):
+        errors.append(f'{label}: expected sections 1..{expected}, found {numbers}')
     return errors
 
 
@@ -343,6 +508,8 @@ def main(argv: list[str]) -> int:
             text = path.read_text(encoding='utf-8')
             errors.extend(check_agent(text, name))
             agents[name] = parse_frontmatter(text)[0] or {}
+    if yaml is None:
+        notes.append('PyYAML not installed: agent frontmatter checked with the strict line parser only')
     installer = (ROOT / 'install.sh').read_text(encoding='utf-8')
     m = re.search(r'^\s*(?:local )?AGENTS=\(([^)]*)\)', installer, re.M)
     if not m or sorted(m.group(1).split()) != sorted(AGENT_NAMES):
@@ -351,12 +518,19 @@ def main(argv: list[str]) -> int:
     readme = (ROOT / 'README.md').read_text(encoding='utf-8')
     errors.extend(check_readme_agents(readme, agents))
     errors.extend(check_agents_doc((ROOT / 'docs/agents.md').read_text(encoding='utf-8'), agents))
+    required = team_min_version(agents)
     mv = re.search(r'MIN_VERSION="([\d.]+)"', installer)
     if not mv:
         errors.append('install.sh: MIN_VERSION not found')
     else:
+        if required and mv.group(1) != required:
+            errors.append(f'install.sh: MIN_VERSION {mv.group(1)} != {required}, the highest '
+                          'min_claude_code in templates/models.json among the pinned models')
         team_docs = {n: (ROOT / n).read_text(encoding='utf-8') for n in
-                     ('README.md', 'SETUP.md', 'CHANGELOG.md', 'docs/product-surfaces.md')}
+                     ('README.md', 'SETUP.md', 'CHANGELOG.md', 'docs/product-surfaces.md',
+                      'docs/start-here.md')}
+        # CHANGELOG keeps history: only its newest entry must agree.
+        team_docs['CHANGELOG.md'] = team_docs['CHANGELOG.md'].split('\n## ')[1] if '\n## ' in team_docs['CHANGELOG.md'] else ''
         errors.extend(check_min_version(team_docs, mv.group(1)))
     errors.extend(check_rates_and_costs(
         (ROOT / 'docs/models-and-effort.md').read_text(encoding='utf-8'),
@@ -368,16 +542,23 @@ def main(argv: list[str]) -> int:
     numbers = [int(n) for n in re.findall(r'^\| (\d+) \|', selector, re.M)]
     if numbers != list(range(1, EXPECTED_TASKS + 1)):
         errors.append(f'task-selector: expected rows 1..{EXPECTED_TASKS}, found {len(numbers)}')
-    recipes = (ROOT / 'docs/workflows.md').read_text(encoding='utf-8')
-    found = [int(n) for n in re.findall(r'^## (\d+)\. ', recipes, re.M)]
-    if found != list(range(1, EXPECTED_RECIPES + 1)):
-        errors.append(f'workflows: expected recipes 1..{EXPECTED_RECIPES}, found {found}')
+    errors.extend(check_sections((ROOT / 'docs/workflows.md').read_text(encoding='utf-8'),
+                                 'docs/workflows.md', r'## (?=\d)', EXPECTED_RECIPES))
+    errors.extend(check_sections((ROOT / 'docs/orchestration-patterns.md').read_text(encoding='utf-8'),
+                                 'docs/orchestration-patterns.md', r'## Pattern ', EXPECTED_PATTERNS))
 
-    # Docs breadcrumbs.
+    # Docs breadcrumbs and footers.
     for path in sorted((ROOT / 'docs').glob('*.md')):
         first = next((l for l in path.read_text(encoding='utf-8').splitlines() if l.strip()), '')
         if '[Home](../README.md)' not in first:
             errors.append(f'docs/{path.name}: first line must be a breadcrumb with [Home](../README.md)')
+    for path in sorted((ROOT / 'docs').rglob('*.md')):
+        rel = path.relative_to(ROOT).as_posix()
+        if rel in FOOTER_EXEMPT:
+            notes.append(f'footer not checked (pending owner decision): {rel}')
+            continue
+        errors.extend(check_docs_footer(path.read_text(encoding='utf-8'), rel, CHECKED_ON,
+                                        require_date=not rel.startswith('docs/atlas/')))
 
     # Manifests and metadata.
     try:
@@ -389,6 +570,10 @@ def main(argv: list[str]) -> int:
         cff = (ROOT / 'CITATION.cff').read_text(encoding='utf-8')
         if f'version: {plugin["version"]}' not in cff:
             errors.append('CITATION.cff version differs from plugin.json')
+        changelog = (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8')
+        top = re.search(r'^## (\d+\.\d+\.\d+)', changelog, re.M)
+        if not top or top.group(1) != plugin['version']:
+            errors.append('CHANGELOG.md: newest entry differs from plugin.json version')
     except (OSError, KeyError, json.JSONDecodeError) as e:
         errors.append(f'plugin manifests: {e}')
     for path in files:
@@ -404,13 +589,16 @@ def main(argv: list[str]) -> int:
             if 'utm_campaign=claude_agent_guide' not in url:
                 errors.append(f'{name}: VYR link without utm_campaign=claude_agent_guide: {url}')
 
-    # Text hygiene across the repository.
+    # Text hygiene, model names and download refs across the repository.
     for path in files:
         if path.suffix not in TEXT_SUFFIXES:
             continue
         rel = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding='utf-8')
         errors.extend(check_text_hygiene(text, rel))
+        errors.extend(check_raw_refs(text, rel))
+        if rel != 'scripts/test_validate.py':  # the tests feed it invented names on purpose
+            errors.extend(check_model_names(text, rel))
         if path.suffix == '.md' and not rel.startswith('docs/atlas/'):
             errors.extend(check_hype(text, rel))
         if rel == 'PUBLISH.md':  # launch copy lives inside code fences
@@ -424,8 +612,10 @@ def main(argv: list[str]) -> int:
             print(f'  - {e}')
         return 1
     print(f'PASS: {stats["markdown"]} Markdown files; {stats["links"]} local links and anchors; '
-          f'{stats["images"]} image references; {len(AGENT_NAMES)} agents; {EXPECTED_TASKS} tasks; '
-          f'{EXPECTED_RECIPES} recipes; rates and cost arithmetic; hygiene checks.'
+          f'{stats["images"]} image references; {len(AGENT_NAMES)} agents (frontmatter '
+          f'{"line + PyYAML" if yaml else "line"} parse); {EXPECTED_TASKS} tasks; {EXPECTED_RECIPES} recipes; '
+          f'{EXPECTED_PATTERNS} patterns; rates, minimum version {required} and cost arithmetic from '
+          f'templates/models.json (checked {CHECKED_ON}); model names; download refs; docs footers; hygiene checks.'
           + (' (images pending)' if any(n.startswith('pending') for n in notes) else ''))
     return 0
 

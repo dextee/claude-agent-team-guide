@@ -66,3 +66,7 @@ This is a fictional scenario, not a customer result or a performance claim.
 Audit evidence traceability, missing-data treatment, reviewer overrides and unauthorised-decision attempts.
 
 Keep a run ID, dated source references, permitted actions, current state, unresolved questions and decision owner with every handoff. Confirm external writes from the receiving system before declaring them complete. See the [build playbook](BUILD_PLAYBOOK.md) for implementation and model-role guidance.
+
+---
+
+*Independent guide, not an Anthropic publication; not affiliated with or endorsed by Anthropic. Workflow statuses are VYR's public descriptions, not an independent audit.*
