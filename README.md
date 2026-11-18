@@ -4,16 +4,16 @@
 
 ### Four models. Four moves. One result you can prove.
 
-A field guide to choosing **Claude Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5** for each job, plus eight installable Claude Code subagents that pin the right model and effort to every role.
+One Claude Code session can hand a focused question to a subagent and check the answer against its source. [Try two subagents on this guide](#your-agent-team-in-60-seconds), then choose from eight reusable roles for your own work. The separate experimental **Agent Teams** feature is not required.
 
-[![Docs checked](https://img.shields.io/badge/docs_checked-2026--10--15-356b57)](SOURCES.md)
+[![Delegation checked](https://img.shields.io/badge/delegation_checked-2026--11--18-356b57)](VALIDATION.md)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-2.1.293%2B-c57c55)](https://code.claude.com/docs/en/model-config)
 [![Agents](https://img.shields.io/badge/subagents-8-333333)](docs/agents.md)
 [![validate](https://github.com/dextee/claude-agent-team-guide/actions/workflows/validate.yml/badge.svg)](https://github.com/dextee/claude-agent-team-guide/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-333333)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/dextee/claude-agent-team-guide?style=social)](https://github.com/dextee/claude-agent-team-guide/stargazers)
 
-**Checked against official Anthropic documentation on 15 October 2026.** Model assignments are starting points to test on your own work, not benchmark results. This is an independent guide, not an Anthropic publication.
+**Two-agent exercise verified on 18 November 2026.** The [source register](SOURCES.md) distinguishes November checks from the October model and pricing snapshot. Model assignments are recommendations, not benchmarks. This is an independent guide, not an Anthropic publication.
 
 Maintained by **[Dexter Ng](https://github.com/dextee), CTO & Cybersecurity Lead at [VYR](https://vyrwork.com/about?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_author)**. [Explore VYR Agent OS](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_intro) · [Work with VYR](WORK_WITH_VYR.md)
 
@@ -66,7 +66,7 @@ Maintained by **[Dexter Ng](https://github.com/dextee), CTO & Cybersecurity Lead
 | **Sonnet 5.5** | The work is scoped and the instructions are clear | One module, a test file, routine review, research, docs | $2 / $10 |
 | **Haiku 5.5** | The job is high-volume, fast and easy to check | Find files, classify, extract fields, route requests | $0.10 / $0.50 for prompts up to 100K tokens |
 
-Anthropic's own guidance: *"If you're unsure which model to use, start with Claude Opus 5.5 for most workloads. Use Claude Fable 5.1 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short."* ([Models overview](https://platform.claude.com/docs/en/about-claude/models/overview)). Prices are standard Claude API list rates ([pricing](https://platform.claude.com/docs/en/about-claude/pricing)), not subscription allowances. The role assignments in this guide are editorial recommendations.
+These are this edition's exact model choices and October API list rates, not subscription allowances. The architect and auditor deliberately pin **Fable 5.1 / high**. As of 18 November 2026, the [models overview](https://platform.claude.com/docs/en/about-claude/models/overview) recommends Fable 5.2 for demanding reasoning; the `fable` alias is not a way to reproduce a 5.1 run. See [model configuration](https://code.claude.com/docs/en/model-config) and [current pricing](https://platform.claude.com/docs/en/about-claude/pricing).
 
 ## The Quartet: map, plan, build, prove
 
@@ -101,37 +101,29 @@ flowchart LR
 
 Requires [Claude Code](https://code.claude.com/docs/en/overview) **v2.1.293 or later** (the first release with Haiku 5.5). Check with `claude --version`; upgrade with `claude update`.
 
-**1. Install** the eight agents into your user agents folder. Settings are not touched.
+**1. Try the plugin in a fresh session.** From a terminal, clone this guide and load its agents for this session only:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash
+git clone https://github.com/dextee/claude-agent-team-guide.git
+cd claude-agent-team-guide
+claude --plugin-dir .
 ```
 
-Prefer to read it first? Download, inspect, then preview:
-
-```bash
-curl -fsSLo install.sh https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh
-less install.sh
-bash install.sh --dry-run    # shows every change, writes nothing
-```
-
-**2. Open your project** and start a session:
-
-```bash
-cd your-project
-claude
-```
-
-**3. Paste this:**
+**2. Give the agents different questions.** Paste this inside Claude Code:
 
 ```text
-Use the explorer agent to map the code involved in [feature]. If the design
-is unclear, use the architect agent to plan it with acceptance checks. Have
-the implementer build it and run the tests, then ask the reviewer to check
-the diff against the plan. Report what changed and how it was verified.
+Use two subagents in parallel. Ask agent-team:explorer to read
+agents/explorer.md and quote its tools field. Ask agent-team:reviewer to
+read .github/workflows/validate.yml and quote its first run command.
+Use only those files. No edits, shell or web. Wait for both agents.
+Return each agent's name, file path and exact quote.
 ```
 
-Run `/tasks` while it works. Claude Code shows the model each subagent is running on ([docs](https://code.claude.com/docs/en/sub-agents)).
+**3. Check the handoff.** Look for **two named delegations** in the session; a correct answer from the lead alone does not count. Use `/tasks` while they run to inspect their models. Then open [the explorer definition](agents/explorer.md) and [the workflow](.github/workflows/validate.yml). The returned lines should be `tools: Read, Glob, Grep` and `run: python3 scripts/validate.py`. If a name is missing, select the qualified role from the `@` picker and rerun its question. [Official subagent reference](https://code.claude.com/docs/en/sub-agents).
+
+![The lead splits a brief between an explorer finding allowed tools and a reviewer finding a CI command, then verifies both quotes.](docs/figures/first-handoff.svg)
+
+This is a delegation exercise; for two simple lookups in real work, one session usually suffices. For your own project, pick an [install option](#install-options) and try a [workflow recipe](docs/workflows.md).
 
 ## The eight agents
 
@@ -141,8 +133,8 @@ Run `/tasks` while it works. Claude Code shows the model each subagent is runnin
 | [implementer](agents/implementer.md) | `claude-opus-5-5` | medium | Full edit + Bash + web | Build the agreed change end to end, with tests |
 | [worker](agents/worker.md) | `claude-sonnet-5-5` | medium | Edit + Bash | Own one clearly scoped chunk; run several in parallel |
 | [explorer](agents/explorer.md) | `claude-haiku-5-5` | medium | Read, Glob, Grep | Find code fast and return paths with line numbers |
-| [reviewer](agents/reviewer.md) | `claude-sonnet-5-5` | high | Read + Bash, no edits | Routine independent review with evidence |
-| [auditor](agents/auditor.md) | `claude-fable-5-1` | high | Read + Bash, no edits | Demanding pre-merge or pre-release review |
+| [reviewer](agents/reviewer.md) | `claude-sonnet-5-5` | high | Bash available; instructed not to edit | Routine independent review with evidence |
+| [auditor](agents/auditor.md) | `claude-fable-5-1` | high | Bash available; instructed not to edit | Demanding pre-merge or pre-release review |
 | [researcher](agents/researcher.md) | `claude-sonnet-5-5` | high | Read-only + web | Gather current sources and flag uncertainty |
 | [editor](agents/editor.md) | `claude-sonnet-5-5` | medium | Edit, no Bash | Turn verified material into clear writing |
 
@@ -205,7 +197,7 @@ Acceptance: [observable checks]
 Return: [result, evidence, unresolved issues, recommended next action]
 ```
 
-A subagent starts with a fresh context. Only the prompt you pass reaches it, and only its final message comes back ([Agent SDK docs](https://code.claude.com/docs/en/agent-sdk/subagents)). Put everything the agent needs in the brief. [Template](templates/task-brief.md).
+These custom subagents load their own role and applicable project instructions. They do not inherit your conversation or the files you already read. Pass decisions, paths and acceptance checks explicitly; ask for evidence in the final answer. [Startup context](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup) · [Brief template](templates/task-brief.md).
 
 ## Effort: start at the default, escalate on evidence
 
@@ -242,7 +234,7 @@ Use the [evaluation worksheet](templates/evaluation.csv) and [cost guide](docs/c
 
 **My account has no Fable access.** Change `model: claude-fable-5-1` to `model: claude-opus-5-5` in `architect.md` and `auditor.md`, and raise their `effort` to `high` or `xhigh` if you need more depth.
 
-**I use Amazon Bedrock, Google Cloud or Microsoft Foundry.** Model aliases map to different versions there, and fast mode and the advisor are not available on those providers. Check that each pinned model is enabled for your account. [Product surfaces](docs/product-surfaces.md).
+**I use Amazon Bedrock, Google Cloud or Microsoft Foundry.** Check that your account supports each exact model ID. Alias mappings and optional features vary, including between the two Google Cloud offerings. [Provider comparison](docs/product-surfaces.md#third-party-providers).
 
 **I installed the earlier edition.** The original guide lived at `dextee/claude-code-agent-team-guide`, now the VYR showcase. This repository replaces it: Sonnet 5 → Sonnet 5.5, Haiku 4.5 → Haiku 5.5, five agents → eight. [Changelog](CHANGELOG.md).
 
@@ -274,8 +266,8 @@ The model recommendations are not evidence of VYR customer outcomes or an Anthro
 
 ## Sources, artwork and maintenance
 
-Every model ID, price, effort setting, frontmatter field, plugin command and CLI flag was checked against official Anthropic documentation on **15 October 2026**. See the [source register](SOURCES.md) and [validation report](VALIDATION.md). Availability varies by plan, provider and Claude Code version, and can change after that date.
+For dated product claims, see the [source register](SOURCES.md). For installer tests, plugin discovery and the two live agent calls, see the [validation report](VALIDATION.md). Availability varies by plan, provider and Claude Code version.
 
-Illustrations are conceptual artwork, not product screenshots or measured results. [Gallery and provenance](assets/README.md).
+Illustrations are conceptual artwork, not product screenshots or measured results. [Still-life gallery](assets/README.md) · [Editable field diagrams and plugin mark](docs/figures/README.md).
 
 **Independent guide, not an Anthropic publication.** Not affiliated with or endorsed by Anthropic. Claude and its model names are trademarks of Anthropic. [MIT license](LICENSE).

@@ -2,9 +2,13 @@
 
 # Twelve workflows with useful handoffs
 
-These recipes are editorial starting points that use [the eight installed agents](agents.md). With the plugin install, prefix names with `agent-team:`, for example `agent-team:reviewer`. Outside Claude Code, run the stages one after another ([product surfaces](product-surfaces.md)).
+These recipes use [ordinary Claude Code subagents](agents.md), not experimental Agent Teams. **Lead** names a suggested model and effort; pasting a recipe does not switch the session. With the plugin, roles have names such as `agent-team:reviewer`. Prose asks Claude to delegate; to request a particular role explicitly, type `@` and pick its agent entry. In ordinary chat, run the stages yourself ([product surfaces](product-surfaces.md)).
 
 Illustrations are conceptual artwork, not screenshots or evidence of completed work. [Provenance](../assets/README.md).
+
+![Two paths: read file A and file B in parallel, then compare the results; or build the diff, review it, then verify in sequence.](figures/dependency-check.svg)
+
+**Can the second agent start now?** Give it an independent question or its own files if it can. If it needs the first agent's result, wait and pass that result on. A reviewer needs the finished diff and the acceptance checks, not just the name of the feature.
 
 ## 1. Deliver a feature
 
@@ -16,8 +20,9 @@ Illustrations are conceptual artwork, not screenshots or evidence of completed w
 Build [feature]. Success means [observable behavior].
 Use the explorer agent to find the responsible files and existing tests.
 If the approach is unclear, use the architect agent to plan it with
-acceptance checks. Have the implementer build it and run the tests, then
-ask the reviewer to check the diff against the plan. Fix material findings.
+acceptance checks. Give the implementer the agreed checks and have it
+build the feature and run the tests. Pass the finished diff, checks and
+test results to the reviewer. Fix material findings.
 Return the changed files, the checks run and any remaining limits.
 ```
 
@@ -49,7 +54,7 @@ Integrate the results yourself, run the full test suite, then ask the
 reviewer agent to check the combined diff.
 ```
 
-**Done means:** the merged state passes. Separate chunk checks do not prove the integrated result works. If a worker runs with `isolation: worktree`, its branch starts from your default branch, not your current `HEAD` ([subagent docs](https://code.claude.com/docs/en/sub-agents)).
+**Done means:** the integrated result passes at the intended commit. The bundled workers share your checkout. If you add `isolation: worktree`, a new worktree normally starts from the repository's default branch. To include commits from your current feature branch, set `worktree.baseRef` to `"head"` and check the starting commit. That selects a commit, not your uncommitted edits. [Worktree base selection](https://code.claude.com/docs/en/worktrees#choose-the-base-branch)
 
 ## 4. Review before merge
 
@@ -74,12 +79,13 @@ Then tell me which requirements were verified and which were not checked.
 ```text
 Change [component] to [goal]. First, use the architect agent to list the
 threat assumptions, trust boundaries and abuse cases, with a test for each.
-Have the implementer build the change and those tests. Then use the
-auditor agent to review the diff against the threat list. Do not mark this
-done until every listed abuse case has a passing test or a stated reason.
+Have the implementer build the change and run those tests. Give the auditor
+the diff, threat list and results. For each required case, report passed
+(with evidence), failed (with observed behavior), or unverified (with
+the missing check). Keep failed and unverified cases open.
 ```
 
-**Done means:** the abuse cases are tested. An AI review is not a substitute for a human security review where your policy requires one.
+**Done means:** every required case has passing evidence. An explanation for a missing test identifies a gap; it does not close it. An AI review does not replace a required human security review.
 
 ## 6. Produce a research decision brief
 
@@ -107,9 +113,9 @@ change the choice.
 ```text
 Write [README / setup guide / API reference] for [audience]. Use the
 explorer agent to collect the real commands, configuration keys, defaults
-and file paths. Have the editor agent write from that evidence only. Run
-every command in the document that is safe to run, and list any you could
-not verify.
+and file paths. Give that evidence to the editor to draft the document.
+As lead, run the commands that are safe to verify in this checkout and
+list any you could not verify.
 ```
 
 **Done means:** every command and setting traces to the code, and the safe ones were run.
@@ -138,15 +144,16 @@ The explorer has Read, Glob and Grep only, so it cannot run git. The lead runs c
 **Lead:** Opus 5.5 / high. **Team:** explorer for code and config in the repo; reviewer for read-only commands; one owner for remediation.
 
 ```text
-Users report [symptom] since [time]. Export the relevant logs to
-[path] first. In parallel, use the explorer agent to read [path] and the
-config files changed recently, and the reviewer agent to run read-only
-commands such as `git log --since="[time]"`. Build a timeline. Propose the most likely cause and the cheapest safe mitigation.
-Do not change production. List the commands you would run and wait for my
-approval before any of them.
+Users report [symptom] since [time]. The exported logs are at [local path].
+Have the explorer read that snapshot and the local config at [paths].
+In parallel, have the reviewer run `git log --since="[time]" -- [paths]`
+in the local checkout. Combine their evidence into a timeline. Identify
+the likely cause, what would disprove it, and a proposed mitigation.
+If the export is missing, report the gap. Do not access production.
+List any proposed live checks or changes for the incident owner.
 ```
 
-**Ownership:** one agent or person owns each live system. Parallel agents gather evidence; they do not act on production at the same time.
+**Ownership:** the two agents inspect local evidence only. The incident owner decides whether to authorize a separate live check or remediation.
 
 ## 10. Upgrade a dependency
 

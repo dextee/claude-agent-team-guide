@@ -85,6 +85,34 @@ main() {
   if [ -L "$agents_dir" ]; then
     echo "Refusing to write: $agents_dir is a symlink. Install with --project or fix the link." >&2; return 1
   fi
+  if [ -L "$manifest" ] || { [ -e "$manifest" ] && [ ! -f "$manifest" ]; }; then
+    warn "Refusing a non-regular or symlinked manifest: $manifest"; return 1
+  fi
+  # Validate every record before touching any destination, including roles
+  # retired since installation. Names must be plain agent filenames.
+  if [ -f "$manifest" ] && ! awk '
+    NF != 2 || length($1) != 64 || $1 !~ /^[a-f0-9]+$/ ||
+    $2 !~ /^[a-z][a-z0-9-]*[.]md$/ || seen[$2]++ {exit 1}
+  ' "$manifest"; then
+    warn "Invalid agent-team manifest; no files changed."; return 1
+  fi
+
+  local dest digest filename
+  if [ "$uninstall" = 1 ]; then
+    if [ ! -f "$manifest" ]; then say "No ownership manifest. No agents removed."; return 0; fi
+    while read -r digest filename || [ -n "$filename" ]; do
+      dest="$agents_dir/$filename"
+      if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then continue; fi
+      if [ ! -L "$dest" ] && [ -f "$dest" ] && [ "$(hash_of "$dest")" = "$digest" ]; then
+        run rm -- "$dest"; echo "   - $filename"
+      else
+        echo "   ! $filename kept (changed or not a regular file)"
+      fi
+    done < "$manifest"
+    run rm -- "$manifest"
+    say "Settings and backups were left in place."
+    return 0
+  fi
 
   # Version check is advisory: files are copied either way. stdin is closed so
   # the child cannot read the rest of a piped script.
@@ -125,72 +153,18 @@ main() {
     head -n1 "$src_dir/agents/$a.md" | grep -qx -- '---' || { echo "Unexpected content in $a.md; aborting." >&2; return 1; }
   done
 
-  # ---------- uninstall ----------
-  if [ "$uninstall" = 1 ]; then
-    local verb="removed"; [ "$dry_run" = 1 ] && verb="would be removed"
-    say "Removing agents from $agents_dir"
-    local dest h recorded
-    for a in "${AGENTS[@]}"; do
-      dest="$agents_dir/$a.md"
-      if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then echo "   - $a (not installed)"; continue; fi
-      if [ -L "$dest" ]; then echo "   ! $a kept (symlink; remove it yourself)"; continue; fi
-      h="$(hash_of "$dest")"
-      recorded=""
-      [ -f "$manifest" ] && recorded="$(awk -v f="$a.md" '$2 == f {print $1}' "$manifest")"
-      if [ "$h" = "$recorded" ] || cmp -s "$src_dir/agents/$a.md" "$dest"; then
-        run rm "$dest"; echo "   - $a $verb"
-      else
-        echo "   ! $a kept (changed since this installer wrote it, so it may hold your edits)"
-      fi
-    done
-    [ -f "$manifest" ] && run rm "$manifest"
-    say "Settings were not changed. Backups (*.bak-*) were left in place."
-    return 0
-  fi
-
-  # ---------- 1. agents ----------
-  say "Installing agents into $agents_dir"
-  run mkdir -p "$agents_dir"
-  local src written=()
-  for a in "${AGENTS[@]}"; do
-    src="$src_dir/agents/$a.md" dest="$agents_dir/$a.md"
-    if [ -L "$dest" ]; then warn "$a skipped: $dest is a symlink"; continue; fi
-    if [ -e "$dest" ] && [ ! -f "$dest" ]; then warn "$a skipped: $dest is not a regular file"; continue; fi
-    if [ -f "$dest" ] && cmp -s "$src" "$dest"; then
-      echo "   = $a (already up to date)"; written+=("$a"); continue
-    fi
-    if [ -f "$dest" ]; then
-      run cp -p "$dest" "$dest.bak-$stamp"
-      echo "   ~ $a (updated; previous version saved as $a.md.bak-$stamp)"
-    else
-      echo "   + $a"
-    fi
-    run cp "$src" "$dest"
-    written+=("$a")
-  done
-
-  # Record what this installer wrote, so --uninstall works after later releases.
-  if [ "$dry_run" = 0 ] && [ "${#written[@]}" -gt 0 ]; then
-    if [ -L "$manifest" ]; then warn "manifest not written: $manifest is a symlink"
-    else
-      : > "$manifest"
-      for a in "${written[@]}"; do printf '%s  %s\n' "$(hash_of "$agents_dir/$a.md")" "$a.md" >> "$manifest"; done
-    fi
-  fi
-
-  # ---------- 2. optional settings preset ----------
+  # Validate requested settings before touching agents or taking backups.
   if [ "$with_settings" = 0 ]; then
     say "Settings untouched (pass --with-settings to merge the recommended preset)"
   elif ! command -v python3 >/dev/null; then
-    warn "python3 not found, so settings were not merged. Add these keys to $settings_file yourself:"
-    cat "$src_dir/templates/recommended-settings.json"
+    warn "--with-settings requires python3. No files changed."; return 1
   else
-    if [ -L "$settings_file" ]; then echo "Refusing to write: $settings_file is a symlink." >&2; return 1; fi
+    if [ -L "$settings_file" ] || { [ -e "$settings_file" ] && [ ! -f "$settings_file" ]; }; then
+      warn "Refusing a non-regular or symlinked settings file."; return 1
+    fi
     say "Merging the recommended preset into $settings_file"
-    run mkdir -p "$claude_dir"
-    if [ -f "$settings_file" ]; then run cp -p "$settings_file" "$settings_file.bak-$stamp"; fi
     FORCE="$force" DRY="$dry_run" python3 - "$settings_file" "$src_dir/templates/recommended-settings.json" <<'PY'
-import json, os, sys, tempfile
+import copy, json, os, shutil, sys, tempfile
 path, rec_path = sys.argv[1], sys.argv[2]
 force, dry = os.environ["FORCE"] == "1", os.environ["DRY"] == "1"
 try:
@@ -202,6 +176,9 @@ except json.JSONDecodeError as e:
     sys.exit(f"   {path} is not valid JSON ({e}). Fix it, then re-run.")
 with open(rec_path, encoding="utf-8") as f:
     rec = json.load(f)
+if not isinstance(current, dict) or not isinstance(rec, dict):
+    sys.exit("   Settings and preset must both be JSON objects.")
+before = copy.deepcopy(current)
 rec.pop("$comment", None)
 
 def merge(cur, new, prefix=""):
@@ -215,13 +192,19 @@ def merge(cur, new, prefix=""):
         elif cur[key] == value:
             print(f"   = {name} (already set)")
         elif force:
-            print(f"   ~ {name}: {json.dumps(cur[key])} -> {json.dumps(value)}")
+            print(f"   ~ {name} updated")
             cur[key] = value
         else:
-            print(f"   ! {name} kept as {json.dumps(cur[key])} (use --force to set {json.dumps(value)})")
+            print(f"   ! {name} kept (use --force to replace)")
 
 merge(current, rec)
-if not dry:
+if not dry and current != before:
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    if os.path.exists(path):
+        fd, backup = tempfile.mkstemp(dir=os.path.dirname(path), prefix="settings.json.bak-")
+        os.close(fd)
+        shutil.copy2(path, backup)
+        print(f"   backup: {backup}")
     fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path) or ".", prefix=".settings-", suffix=".json")
     with os.fdopen(fd, "w", encoding="utf-8") as f:
         json.dump(current, f, indent=2)
@@ -229,6 +212,33 @@ if not dry:
     os.replace(tmp, path)
 PY
   fi
+
+  say "Installing agents into $agents_dir"
+  run mkdir -p "$agents_dir"
+  local src backup next_manifest
+  for a in "${AGENTS[@]}"; do
+    src="$src_dir/agents/$a.md" dest="$agents_dir/$a.md"
+    if [ -L "$dest" ]; then warn "$a skipped: $dest is a symlink"; continue; fi
+    if [ -e "$dest" ] && [ ! -f "$dest" ]; then warn "$a skipped: $dest is not a regular file"; continue; fi
+    if [ -f "$dest" ] && cmp -s "$src" "$dest"; then
+      echo "   = $a (already up to date)"; continue
+    fi
+    if [ -f "$dest" ]; then
+      if [ "$dry_run" = 1 ]; then echo "   ~ $a (would back up and update)"; continue; fi
+      backup="$(mktemp "$dest.bak-$stamp-XXXXXX")"
+      cp -p "$dest" "$backup"; echo "   ~ $a (backup: $backup)"
+    else
+      echo "   + $a"
+    fi
+    if [ "$dry_run" = 1 ]; then continue; fi
+    cp "$src" "$dest"
+    # Only claim files actually written. Keep previous records (including
+    # retired roles) and replace the manifest atomically after each write.
+    next_manifest="$(mktemp "$agents_dir/.agent-team-record-XXXXXX")"
+    if [ -f "$manifest" ]; then awk -v f="$a.md" '$2 != f' "$manifest" > "$next_manifest"; fi
+    printf '%s  %s\n' "$(hash_of "$dest")" "$a.md" >> "$next_manifest"
+    mv -f -- "$next_manifest" "$manifest"
+  done
 
   if [ "$dry_run" = 1 ]; then say "Dry run complete. Re-run without --dry-run to apply."; return 0; fi
 

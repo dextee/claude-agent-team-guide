@@ -2,7 +2,7 @@
 
 # Which Claude product are you using?
 
-Checked against official documentation: **15 October 2026**. The agent files in this repository are **Claude Code subagents**. They work wherever Claude Code reads `.claude/agents/`. Ordinary Claude chat does not load them.
+The agent files in this repository are **Claude Code subagents**. Ordinary Claude chat does not load them. The surface overview was checked on **15 October 2026**; the SDK budget and provider notes have [targeted checks dated 18 November 2026](../SOURCES.md#18-november-2026-source-checks).
 
 | Surface | What this guide means there | What to check |
 |---|---|---|
@@ -59,21 +59,23 @@ options = ClaudeAgentOptions(
 )
 ```
 
-Pass `options` to `query()` with your prompt. Agents defined in code take precedence over files with the same name. Field reference: [AgentDefinition](https://code.claude.com/docs/en/agent-sdk/subagents). Python package `claude-agent-sdk`; TypeScript `@anthropic-ai/claude-agent-sdk`.
+Pass `options` to `query()` with your prompt. The role's `tools` list restricts that agent; the parent's `allowed_tools` list names tools approved without prompting, **not** the only tools the parent can use. [AgentDefinition](https://code.claude.com/docs/en/agent-sdk/subagents) · [Python options](https://code.claude.com/docs/en/agent-sdk/python). Python package `claude-agent-sdk`; TypeScript `@anthropic-ai/claude-agent-sdk`.
 
-Fable requests from the SDK can bill usage credits without a consent prompt on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config)). Set a spend cap with `max_budget_usd`.
+Fable requests from SDK apps that do not show the consent prompt can bill usage credits on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config#fable-and-usage-credits)). `max_budget_usd` is a **per-query stop threshold**, not a hard spending ceiling. Claude Code checks after a model response arrives. That response and work already in flight from parallel subagents can push the total past the threshold. Leave headroom. [SDK budget behavior](https://code.claude.com/docs/en/agent-sdk/agent-loop#budget-headroom)
 
 ## Third-party providers
 
-| | Anthropic API | Claude Platform on AWS | Amazon Bedrock, Google Cloud | Microsoft Foundry |
-|---|---|---|---|---|
-| `opus` alias resolves to | Opus 5.5 | Opus 5.5 | Opus 5.5 | Opus 4.6 |
-| `sonnet` alias resolves to | Sonnet 5.5 | Sonnet 4.6 | Sonnet 4.5 | Sonnet 4.5 |
-| `haiku` alias resolves to | Haiku 5.5 | Haiku 4.5 | Haiku 4.5 | Haiku 4.5 |
-| Advisor tool | Yes (experimental) | No | No | No |
-| Fast mode | Yes (research preview) | No | No | No |
+| Provider | `opus` | `sonnet` | `haiku` |
+|---|---|---|---|
+| Anthropic API | Opus 5.5 | Sonnet 5.5 | Haiku 5.5 |
+| Claude Platform on AWS | Opus 5.5 | Sonnet 4.6 | Haiku 4.5 |
+| Claude Models on Google Cloud (Anthropic managed) | Opus 5.5 | Sonnet 5.5 | Haiku 4.5 |
+| Amazon Bedrock, Google Cloud's Agent Platform | Opus 5.5 | Sonnet 4.5 | Haiku 4.5 |
+| Microsoft Foundry | Opus 4.6 | Sonnet 4.5 | Haiku 4.5 |
 
-Source: [model configuration](https://code.claude.com/docs/en/model-config), [advisor](https://code.claude.com/docs/en/advisor), [fast mode](https://code.claude.com/docs/en/fast-mode). This is why the agent files pin full model IDs instead of aliases: an alias can mean an older model on another provider. A pinned ID makes the intended version explicit, so check that each one is enabled in your account. Anthropic recommends pinning model versions with `ANTHROPIC_DEFAULT_OPUS_MODEL` and related variables before rolling out on third-party providers.
+These are Claude Code's [default alias mappings](https://code.claude.com/docs/en/model-config#model-aliases). An exact ID in a role states the intended version; check that your provider and account can serve it.
+
+The [advisor](https://code.claude.com/docs/en/advisor) supports the Anthropic API; it also supports Claude Platform on AWS and Claude Models on Google Cloud (Anthropic managed) from v2.1.300. It is unavailable on Bedrock, Google's Agent Platform and Foundry. [Fast mode](https://code.claude.com/docs/en/fast-mode#requirements) has different requirements, including conditional support on Google's Agent Platform. Neither feature is required for these roles.
 
 ## CI and chat integrations
 
@@ -81,4 +83,4 @@ Source: [model configuration](https://code.claude.com/docs/en/model-config), [ad
 - **Non-interactive runs:** `claude -p "..."` runs one prompt and exits. Fable billing consent is not requested in this mode.
 - **Slack:** Claude Code can take tasks from Slack mentions ([overview](https://code.claude.com/docs/en/overview)).
 
-Project agents committed to the repository are available to any Claude Code run on that checkout.
+For CI, check that the actual runner loaded the project agents before relying on a named delegation. File presence alone does not verify that the requested role or model ran.

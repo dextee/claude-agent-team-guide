@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — 2026-11-18
+
+- First-run exercise with two named delegations, two source quotes and a check the reader can repeat. Added two editable field diagrams and a plugin icon.
+- Installer rollback uses recorded ownership, works from a standalone script without downloading agent definitions, and preserves unowned identical files. Changed files get unique backups; invalid optional settings stop installation before agents are written.
+- Added eight installer regression cases to the existing CI test suite. See [validation](VALIDATION.md) for the separate Claude CLI discovery check, live run and limits.
+
 ## 2.0.0 — 2026-10-15
 
 New home: `dextee/claude-agent-team-guide`. The previous repository, `dextee/claude-code-agent-team-guide`, was renamed to `dextee/vyr-agent-os-workflows` on 27 September 2026 and its guide content removed. This release restores the guide and restructures it to match the ChatGPT and Kimi guides.

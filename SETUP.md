@@ -49,16 +49,25 @@ Plugin agents appear with a prefix, such as `agent-team:auditor`. Pick one metho
 
 ### What the installer does
 
-- Copies eight Markdown files. It skips identical files and saves a changed file as `<name>.md.bak-<timestamp>` before replacing it.
+- Copies eight Markdown files. It skips identical files and saves a changed file under a unique `<name>.md.bak-*` name before replacing it.
 - Refuses to write through a symlinked agents folder or agent file.
 - Leaves `settings.json` alone unless you pass `--with-settings`.
 - Checks your Claude Code version and warns if it is older than v2.1.293. It does not call any model.
 - Records the hash of each file it wrote in `.agent-team-manifest` in the agents folder, so `--uninstall` can tell your edits apart from its own files, even after later releases.
-- Downloads from the `main` branch when run through `curl`. To pin a release, fetch the installer from that tag and set the variable on the `bash` side of the pipe:
+- Downloads from the moving `main` branch when run through `curl`. For a reproducible install, use a checkout: the script and all eight definitions then come from the same commit. Record the full commit ID during review. The commands below stop if cloning or checkout fails:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/v2.0.0/install.sh | AGENT_TEAM_REF=v2.0.0 bash
+git clone https://github.com/dextee/claude-agent-team-guide.git pinned-agent-team &&
+(
+  cd pinned-agent-team &&
+  ref=$(git rev-parse --verify HEAD) &&
+  git switch --detach "$ref" &&
+  printf 'Record this commit: %s\n' "$ref" &&
+  bash install.sh --dry-run
+)
 ```
+
+After reviewing the preview, run `bash pinned-agent-team/install.sh`. On another machine, check out the recorded full commit ID before running the script.
 
 ### Optional settings preset
 
@@ -74,6 +83,8 @@ This makes subagents and agent-team teammates that have no model of their own de
 
 ## 3. Verify
 
+For a **user or project file install**, check the files at that scope:
+
 ```bash
 AGENTS_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents"   # or <project>/.claude/agents for option B
 ls "$AGENTS_DIR"
@@ -82,18 +93,19 @@ grep -H '^model:' "$AGENTS_DIR"/{architect,implementer,worker,explorer,reviewer,
 
 Expected models: architect and auditor `claude-fable-5-1`; implementer `claude-opus-5-5`; worker, reviewer, researcher and editor `claude-sonnet-5-5`; explorer `claude-haiku-5-5`.
 
-For the plugin route, `claude plugin details agent-team` lists `Agents (8)`. To update later: `claude plugin marketplace update dextee-guides`, then `claude plugin update agent-team@dextee-guides`.
+For a **marketplace plugin install**, skip the file checks above. Use `claude plugin details agent-team` to check the eight agents; use the qualified name `agent-team:explorer` rather than a bare `explorer` that could resolve to a separate file install. To update later: `claude plugin marketplace update dextee-guides`, then `claude plugin update agent-team@dextee-guides`.
 
 Then start a new session in a project and ask:
 
 ```text
-Use the explorer agent to list this project's entry points and test commands.
-Return file paths only. Make no edits.
+Use the explorer agent to find the project's test command in a file.
+Quote the command and cite its file and line, or say you could not find it.
+Do not run it or edit anything.
 ```
 
 Run `/tasks` while it works. Claude Code names each subagent's model and effort there (v2.1.242 or later). Claude Code picks up new agent files within a few seconds; if the `agents` folder was created during the session, restart the session ([Agent SDK troubleshooting](https://code.claude.com/docs/en/agent-sdk/subagents)).
 
-Installing files proves only that the files are in place. It does not prove your account can run each model.
+For the plugin route use `agent-team:explorer` in the prompt above. Check the named delegation as well as the answer. The [two-agent exercise](README.md#your-agent-team-in-60-seconds) has known answers you can compare against the source. A successful explorer run does not establish access to the other pinned models.
 
 ## 4. Tell the user what is left
 
@@ -110,13 +122,13 @@ The agent files use Anthropic API model IDs. On Amazon Bedrock and Google Cloud,
 
 - Confirm the pinned model is enabled in your account and region.
 - If not, change the `model:` line to a model you can use, or use `modelOverrides` in settings to map the Anthropic ID to your provider ID.
-- Skip the advisor and fast mode; neither is available on these providers.
+- Neither advisor nor fast mode is required. Check [provider-specific support](docs/product-surfaces.md#third-party-providers) if you want to use them.
 
 **No Fable access on any provider?** If `/model` does not list Fable, change `model:` to `claude-opus-5-5` in `architect.md` and `auditor.md`.
 
 ## Optional: add an advisor
 
-The [advisor tool](https://code.claude.com/docs/en/advisor) lets the main model consult a stronger model at decision points. It is experimental, Anthropic API only, and adds usage. With Opus 5.5 as the main model, accepted advisors are Fable or Opus 5 and later.
+The [advisor tool](https://code.claude.com/docs/en/advisor) lets the main model consult another model at decision points. It is experimental, adds usage and requires a supported provider and model pairing.
 
 ```text
 /advisor opus      # a second Opus reviews key decisions
@@ -136,10 +148,12 @@ bash install.sh --uninstall --project /path/to/project
 curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall
 ```
 
-Uninstall removes only files whose content still matches what the installer wrote (from its manifest) or the current release. Edited files are kept and listed. Add `--dry-run` to preview. To restore a replaced file, rename its `.bak-<timestamp>` copy back to `<name>.md`. If you used `--with-settings`, restore `settings.json` from its `.bak-<timestamp>` copy or delete the `CLAUDE_CODE_SUBAGENT_MODEL` key.
+Uninstall removes only files recorded in its manifest that still match their recorded hash. Edited files and unowned files are kept. Without a manifest it leaves the agents alone. Add `--dry-run` to preview. To restore a replaced file, rename its `.bak-*` copy back to `<name>.md`. If you used `--with-settings`, compare your current `settings.json` with its backup before restoring the previous value.
+
+Upgrading from the October installer? Its manifest could include identical files you already owned. Preview uninstall and keep a copy of any such file before removing that older installation.
 
 For the plugin: `claude plugin uninstall agent-team@dextee-guides`, or `claude plugin marketplace remove dextee-guides` to remove the marketplace and its plugins.
 
 ## What was tested here
 
-The installer's behavior is covered by [filesystem tests](scripts/test_installer.py) in temporary folders. The plugin manifests pass `claude plugin validate --strict`, and a local plugin install reported all eight agents. No live model runs were part of these checks. See [validation](VALIDATION.md).
+The installer's behavior is covered by [filesystem tests](scripts/test_installer.py) in temporary folders. Claude Code discovered all eight plugin roles, and a live run returned source evidence from the explorer and reviewer. See [validation](VALIDATION.md) for the checks and limits.

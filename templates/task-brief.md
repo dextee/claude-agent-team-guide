@@ -1,6 +1,6 @@
 # Delegated task brief
 
-A subagent starts with a fresh context: only this brief reaches it, and only its final message comes back. Include everything it needs.
+A new custom subagent starts without the lead's conversation history or the contents of files the lead already read. It gets its role instructions, the delegation prompt and applicable project instructions; in a Git repository it normally also gets a status snapshot. A fork is different: it inherits the parent conversation. Pass the decisions and evidence this role needs, and ask for a final answer the lead can use on its own. [What loads at startup](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup)
 
 ## Outcome
 

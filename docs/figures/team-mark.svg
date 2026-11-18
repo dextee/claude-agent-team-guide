@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 192 192" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Team field guide mark</title>
+  <desc id="desc">Two folded pages share a brass spine. Their separate routes meet at a single point below the book.</desc>
+  <rect width="192" height="192" rx="37" fill="#262922"/>
+  <path d="M30 45 86 61 86 122 30 106Z" fill="#efdfbf"/>
+  <path d="M106 61 162 45 162 106 106 122Z" fill="#dc9876"/>
+  <path d="m40 58 36 10m-36 4 26 7" fill="none" stroke="#857559" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="m116 69 36-10m-36 24 26-7" fill="none" stroke="#814c37" stroke-width="3.5" stroke-linecap="round"/>
+  <g fill="none" stroke="#cfb779" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M96 63v61m-55-6 55 24 55-24"/>
+  </g>
+  <circle cx="96" cy="143" r="7" fill="#efe4c8"/>
+</svg>
