@@ -49,20 +49,25 @@ Plugin agents appear with a prefix, such as `agent-team:auditor`. Pick one metho
 
 ### What the installer does
 
-- Copies eight Markdown files. It skips identical files and saves a changed file as `<name>.md.bak-<timestamp>` before replacing it.
+- Copies eight Markdown files. It skips identical files and saves a changed file under a unique `<name>.md.bak-*` name before replacing it.
 - Refuses to write through a symlinked agents folder or agent file.
 - Leaves `settings.json` alone unless you pass `--with-settings`.
 - Checks your Claude Code version and warns if it is older than the team's minimum. It does not call any model.
 - Records the hash of each file it wrote in `.agent-team-manifest` in the agents folder, so `--uninstall` can tell your edits apart from its own files, even after later releases.
-- Downloads from the `main` branch when run through `curl`. To pin an exact version, use a full commit SHA. Fetch the installer from that commit and set the same SHA on the `bash` side of the pipe, so the agent files come from it too:
+- In a checkout the installer reads the local role files. A standalone copy downloads them from the Git ref selected with `AGENT_TEAM_REF`.
+
+### Install the tagged release
+
+Run these commands from the root of the project that will use the agents. Keep the downloaded installer in a temporary directory so it reads the role files from the selected public release.
 
 ```bash
-SHA="$(git ls-remote https://github.com/dextee/claude-agent-team-guide.git refs/heads/main | cut -f1)"
-echo "$SHA"    # record it; this is the version you are pinning
-curl -fsSL "https://raw.githubusercontent.com/dextee/claude-agent-team-guide/$SHA/install.sh" | AGENT_TEAM_REF="$SHA" bash
+installer_dir="$(mktemp -d)" &&
+curl -fsSLo "$installer_dir/install.sh" https://raw.githubusercontent.com/dextee/claude-agent-team-guide/v3.0.0/install.sh &&
+AGENT_TEAM_REF=v3.0.0 bash "$installer_dir/install.sh" --project . --dry-run &&
+AGENT_TEAM_REF=v3.0.0 bash "$installer_dir/install.sh" --project .
 ```
 
-The repository has no release tags yet, so pin by commit SHA rather than a tag name.
+The preview lists the eight files. The install records ownership in `.claude/agents/.agent-team-manifest`. Repeat the last command to skip matching files. For a byte-for-byte pin, replace the tag in the download URL and both environment assignments with the same reviewed 40-character commit ID. [Release notes](https://github.com/dextee/claude-agent-team-guide/releases/tag/v3.0.0)
 
 ### Optional settings preset
 
@@ -142,10 +147,12 @@ bash install.sh --uninstall --project /path/to/project
 curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall
 ```
 
-Uninstall removes only files whose content still matches what the installer wrote (from its manifest) or the current release. Edited files are kept and listed. Add `--dry-run` to preview. To restore a replaced file, rename its `.bak-<timestamp>` copy back to `<name>.md`. If you used `--with-settings`, restore `settings.json` from its `.bak-<timestamp>` copy or delete the `CLAUDE_CODE_SUBAGENT_MODEL` key.
+Uninstall removes only files recorded in its manifest that still match their recorded hash. Edited files and unowned files are kept. Without a manifest it leaves the agents alone. Add `--dry-run` to preview. To restore a replaced file, rename its `.bak-*` copy back to `<name>.md`. If you used `--with-settings`, compare your current `settings.json` with its backup before restoring the previous value.
+
+Upgrading from the October installer? Its manifest could include identical files you already owned. Preview uninstall and keep a copy of any such file before removing that older installation.
 
 For the plugin: `claude plugin uninstall agent-team@dextee-guides`, or `claude plugin marketplace remove dextee-guides` to remove the marketplace and its plugins.
 
 ## What was tested here
 
-The installer's behavior is covered by [filesystem tests](scripts/test_installer.py) in temporary folders. No live model runs were part of these checks, and the 3.0.0 changes were not exercised in a Claude Code session at v2.1.321 or later. See [validation](VALIDATION.md).
+The installer's behavior is covered by [filesystem tests](scripts/test_installer.py) in temporary folders. Claude Code discovered all eight plugin roles, and a live run returned source evidence from the explorer and reviewer. See [validation](VALIDATION.md) for the checks and limits.

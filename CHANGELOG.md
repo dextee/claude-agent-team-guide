@@ -1,9 +1,12 @@
 # Changelog
 
-## 3.0.0 — 2026-11-15
+## 3.0.0 — 2026-11-20
 
 The guide is re-centred on running a team of subagents. Model routing becomes one chapter. Checked against official Anthropic documentation on 15 November 2026.
 
+- Added a first exercise with two named delegations, source quotes and a comparison diagram. The 18 November run record identifies both roles.
+- Installer rollback follows its local ownership manifest, preserves identical pre-existing files and uses unique backups. Invalid optional settings are checked before writing agents. Installed roles are replaced atomically so a second hard link keeps its original content. The suite covers 23 installer cases.
+- Added a tagged project-install command and refreshed the companion guide’s model assignments.
 - **New chapters:** [start here](docs/start-here.md), [when to delegate](docs/when-to-delegate.md), [how subagents run](docs/how-subagents-run.md) (background by default, completion notifications, final-message handback, forks, `SendMessage`, resume, limits), [orchestration patterns](docs/orchestration-patterns.md) (six patterns including the three-stage audit loop), [handoff contracts](docs/handoff-contracts.md), [parallel work and worktrees](docs/parallel-work-and-worktrees.md), [gates and hooks](docs/gates-and-hooks.md), [failure modes](docs/failure-modes.md) and [agent teams](docs/agent-teams.md).
 - **Agent files:** [docs/agents.md](docs/agents.md) now documents every frontmatter field in the official reference.
 - **Models:** architect and auditor move from `claude-fable-5-1` to `claude-fable-5-2` (the Fable the models overview now recommends; $8 / $40 against $10 / $50). They keep `effort: high`, which is now an explicit raise over Claude Code's `medium` default for Fable 5.2. Fable 5.1 is documented as the older option.
@@ -12,7 +15,7 @@ The guide is re-centred on running a team of subagents. Model routing becomes on
 - **Templates:** new [return contract](templates/return-contract.md), an example [SubagentStop gate](templates/hooks/subagent-stop-gate.sh), and [templates/models.json](templates/models.json) as the single source for model IDs, rates, effort defaults and minimum versions. Team rules, the task brief and the agent template updated.
 - **Recipes:** all twelve now say what proves they worked; the refactor recipe uses worktrees and an integration step; the security recipe uses the three-stage audit loop.
 - **Corrections:** advisor availability (not "Anthropic API only"), fast mode (available, not a research preview, for Opus 5.5 and Fable 5.2), the `effortLevel` fallback (does not apply from user settings to Opus 5.5 and later), `inherit` for nested subagents, the provider alias table (adds Claude Models on Google Cloud, Anthropic managed), GitHub Action quick setup (also subscriptions). The `/tasks` version note is now sourced.
-- **Pinning:** the setup page pins by commit SHA. The `v2.0.0` tag example returned 404 because the repository has no tags.
+- **Pinning:** the setup page now uses the 3.0.0 release tag and explains full commit pins. This replaces the earlier example referencing the unpublished 2.0.0 tag.
 - **Validator:** reads `templates/models.json`; parses agent frontmatter with a strict line parser and, when installed, PyYAML; rejects undocumented frontmatter fields and bad values; derives the minimum version from the pinned models; rejects tag refs in download URLs; rejects model names not in `templates/models.json`; checks docs footers and check dates, and that every recipe and pattern has a prompt and a proof line. Each new check has a regression test.
 - **Docs:** every docs page ends with the independent-guide footer (one atlas page excepted, pending an owner decision). The atlas status labels were rechecked. A "Savings examples" row that pointed to nothing was removed from WORK_WITH_VYR.md.
 

@@ -33,8 +33,6 @@ When a model or price changes, update `templates/models.json` first, then the ag
 
 When you add a check to `scripts/validate.py`, add a test to `scripts/test_validate.py` that feeds it a broken input and expects an error. A check that has never failed is not known to work.
 
-## Open owner decisions
+## Release verification
 
-Record decisions here when the owner makes them, so the next maintainer does not re-raise them.
-
-- Whether to tag releases. Until tags exist, docs pin by commit SHA and the validator rejects tag refs in download URLs.
+- Release downloads may use the tag matching the plugin version or a full commit SHA. Verify the tagged installer on a disposable project.

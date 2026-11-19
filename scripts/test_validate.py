@@ -199,6 +199,8 @@ class NewDocChecks(unittest.TestCase):
         tag = base + 'v2.0.0/install.sh'
         self.assertEqual(v.check_raw_refs(ok + ' ' + sha, 'x.md'), [])
         self.assertTrue(v.check_raw_refs(tag, 'x.md'))
+        release = json.loads(read('.claude-plugin/plugin.json'))['version']
+        self.assertEqual(v.check_raw_refs(base + 'v' + release + '/install.sh', 'x.md'), [])
         self.assertEqual(v.check_raw_refs(read('SETUP.md'), 'SETUP.md'), [])
 
     def test_unknown_model_names(self):

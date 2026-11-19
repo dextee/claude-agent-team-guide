@@ -8,6 +8,10 @@ Every prompt assumes two things from [how subagents run](how-subagents-run.md): 
 
 Illustrations are conceptual artwork, not screenshots or evidence of completed work. [Provenance](../assets/README.md).
 
+![Parallel file reads can start together; a review waits for the completed diff.](figures/dependency-check.svg)
+
+Give each independent task its own question or files. When one task needs another’s result, pass the finished artifact and its acceptance checks to the next agent.
+
 ## 1. Deliver a feature
 
 <img src="../assets/images/workflow-coding.png" alt="Ivory and terracotta blocks being assembled into a modular structure, with a brass jig placing a charcoal block and a spirit level beside it" width="100%">
@@ -119,7 +123,7 @@ choice.
 Write [README / setup guide / API reference] for [audience]. Use the
 explorer agent to collect the real commands, configuration keys, defaults
 and file paths, with file and line for each. Have the editor agent write
-from that evidence only. Run every command in the document that is safe to
+from that evidence only. As lead, run every command in the document that is safe to
 run, and list any you could not verify.
 ```
 
@@ -149,13 +153,13 @@ The explorer has Read, Glob and Grep only, so it cannot run git. The lead runs c
 **Lead:** Opus 5.5 / high. **Team:** explorer for code and config in the repo; reviewer for read-only commands; one owner for remediation.
 
 ```text
-Users report [symptom] since [time]. Export the relevant logs to [path]
-first. In parallel, use the explorer agent to read [path] and the config
-files changed recently, and the reviewer agent to run read-only commands
-such as `git log --since="[time]"`. Wait for both. Build a timeline.
-Propose the most likely cause and the cheapest safe mitigation. Do not
-change production. List the commands you would run and wait for my
-approval before any of them.
+Users report [symptom] since [time]. The exported logs are at [local path].
+Have the explorer read that snapshot and the local config at [paths].
+In parallel, have the reviewer run `git log --since="[time]" -- [paths]`
+in the local checkout. Combine their evidence into a timeline. Identify
+the likely cause, what would disprove it, and a proposed mitigation.
+If the export is missing, report the gap. Do not access production.
+List any proposed live checks or changes for the incident owner.
 ```
 
 **What proves it worked:** each timeline entry cites a log line or commit, the proposed cause explains the start time, and nothing ran against production before your approval.

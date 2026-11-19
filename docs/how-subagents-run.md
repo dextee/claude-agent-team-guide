@@ -21,7 +21,7 @@ Only its **final message** returns. Its intermediate tool calls and results stay
 
 Two consequences shape every recipe in this guide:
 
-1. **The brief is the whole world.** Put file paths, error text, the base commit, decisions and acceptance checks in the request. If a CLAUDE.md rule must reach a subagent that skips CLAUDE.md, restate it. [Task brief template](../templates/task-brief.md).
+1. **Include the task-specific context.** Put file paths, error text, the base commit, decisions and acceptance checks in the request. If a CLAUDE.md rule must reach a subagent that skips CLAUDE.md, restate it. [Task brief template](../templates/task-brief.md).
 2. **The final message is the whole result.** Ask for a structured return with evidence, not a narrative. [Return contract](../templates/return-contract.md).
 
 ## Background by default, and completion notifications
@@ -53,7 +53,7 @@ A **fork** is a subagent that inherits the whole conversation instead of startin
 
 | | Fork | Fresh (non-fork) subagent |
 |---|---|---|
-| Context | Full conversation history | Only the delegation message |
+| Context | Full conversation history | Role, brief, applicable project instructions and environment details |
 | System prompt and tools | Same as the parent | From its agent file, filtered for background runs |
 | Model | The parent's | The subagent model order ([agent files](agents.md#how-claude-code-picks-the-model-for-a-subagent)) |
 | Prompt cache | Shared with the parent, so cheaper to start | Its own |

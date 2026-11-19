@@ -4,22 +4,22 @@
 
 This guide is one of three that share a role spine: architect, implementer, worker, explorer, reviewer and auditor. If you already use the [ChatGPT Agent Team Guide](https://github.com/dextee/chatgpt-agent-team-guide) or the [Kimi Agent Team Guide](https://github.com/dextee/kimi-agent-team-guide), these tables map their roles and controls onto Claude Code.
 
-The ChatGPT and Kimi columns are taken from those guides' own READMEs and setup pages (checked by their authors on 6 October and 10 October 2026). The Codex install paths (`.codex/agents/`, `~/.codex/agents/`) and the `/agent` command come from the ChatGPT guide's SETUP.md, not its README. The Claude column was checked on 15 November 2026. Model assignments in all three are editorial starting points. **No equivalence between vendors' models is claimed.**
+The ChatGPT assignments follow the [published role map](https://github.com/dextee/chatgpt-agent-team-guide/blob/743fb754c3511e064cded61aa481c405e41ae309/config/role-map.json) checked on 20 November 2026. The Kimi assignments follow its [agent roster](https://github.com/dextee/kimi-agent-team-guide/blob/main/agents/README.md). The Codex install paths (`.codex/agents/`, `~/.codex/agents/`) and the `/agent` command come from the ChatGPT guide's SETUP.md, not its README. The Claude column was checked on 15 November 2026. Model assignments in all three are editorial starting points. **No equivalence between vendors' models is claimed.**
 
 ## Role mapping
 
 | Role | ChatGPT guide (Codex) | Kimi guide (Kimi Code) | This guide (Claude Code) |
 |---|---|---|---|
-| Architect | GPT-6 Astra / high | K3 / max | Fable 5.2 / high |
-| Implementer | GPT-6.1 Sol / medium | kimi-for-coding / high | Opus 5.5 / medium |
+| Architect | GPT-6.2 Astra / high | K3 / max | Fable 5.2 / high |
+| Implementer | GPT-6.2 Sol / medium | kimi-for-coding / high | Opus 5.5 / medium |
 | Worker | GPT-6 Luna / medium | kimi-for-coding-highspeed loop | Sonnet 5.5 / medium |
 | Explorer | GPT-6 Luna / high | kimi-for-coding / low | Haiku 5.5 / medium |
-| Reviewer | GPT-6.1 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
-| Auditor | GPT-6 Astra / high | K3 / max | Fable 5.2 / high |
-| Researcher | GPT-6.1 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
-| Editor | GPT-6.1 Sol / medium | kimi-for-coding / low | Sonnet 5.5 / medium |
-| Visual director | GPT-6.1 Sol / medium + image tool | Not ported | Not ported; Claude models do not generate images |
-| Everyday lead | Sol / medium | kimi-for-coding / high | Opus 5.5 / medium |
+| Reviewer | GPT-6.2 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
+| Auditor | GPT-6.2 Astra / high | K3 / max | Fable 5.2 / high |
+| Researcher | GPT-6.2 Sol / high | kimi-for-coding / high | Sonnet 5.5 / high |
+| Editor | GPT-6.2 Sol / medium | kimi-for-coding / low | Sonnet 5.5 / medium |
+| Visual director | GPT-6.1 Terra / medium | Not ported | Not ported; Claude models do not generate images |
+| Everyday lead | GPT-6.2 Sol / medium | kimi-for-coding / high | Opus 5.5 / medium |
 
 ## Lever mapping
 

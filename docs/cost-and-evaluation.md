@@ -28,7 +28,7 @@ Source: [costs](https://code.claude.com/docs/en/costs), [subagents](https://code
 | Running at once | 20 subagents | `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` | Spawning fails with `Concurrent subagent limit reached` until the count drops |
 | Total per session | No limit | — | — |
 | Turns per subagent | None unless set | `maxTurns` in the agent file | Output returns marked as partial; Claude can resume the subagent |
-| Spend per query (Agent SDK) | No limit | `max_budget_usd` (Python) or `maxBudgetUsd` (TypeScript) | No more subagents; running background subagents stop; the query ends with `error_max_budget_usd` |
+| Spend threshold per query (Agent SDK) | No limit | `max_budget_usd` (Python) or `maxBudgetUsd` (TypeScript) | No more subagents; running background subagents stop; the query ends with `error_max_budget_usd`. The check follows a model response. In-flight requests can take the total above the threshold. [Budget headroom](https://code.claude.com/docs/en/agent-sdk/agent-loop#budget-headroom) |
 
 Sources: [subagents](https://code.claude.com/docs/en/sub-agents#concurrent-subagent-limit), [Agent SDK: cap subagent depth, concurrency, and spend](https://code.claude.com/docs/en/agent-sdk/subagents). The concurrency limit needs Claude Code v2.1.217 or later. Agent-team teammates and workflow agents follow their own limits.
 
@@ -73,7 +73,7 @@ The [evaluation worksheet](../templates/evaluation.csv) is intentionally empty. 
 - Parallelize independent work when elapsed time matters, but count every agent's usage.
 - Use `/clear` between unrelated tasks; stale context costs tokens on every message.
 - Stop reviewing once the acceptance checks pass. Match verification to the remaining risk.
-- In automation, set the depth, concurrency and spend caps above before the first run, not after the first bill.
+- In automation, set the depth and concurrency limits and the spend threshold above before the first run, not after the first bill.
 
 ---
 

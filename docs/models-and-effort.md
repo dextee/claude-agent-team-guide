@@ -67,6 +67,12 @@ Per-model notes from the [effort guide](https://platform.claude.com/docs/en/buil
 
 ### Where effort is set
 
+For a **non-fork subagent**, check these in order:
+
+1. `CLAUDE_CODE_EFFORT_LEVEL` set to a level such as `high` overrides both the invocation and the file.
+2. An `effort` passed when Claude starts the subagent overrides its file for that run, including when resumed. Per-invocation effort is supported from v2.1.292.
+3. The role's `effort:` field sets its usual level. All eight roles here set one. Organization limits can restrict the effective level. [Subagent effort](https://code.claude.com/docs/en/sub-agents#choose-an-effort-level)
+
 Claude Code resolves the session's level in this order, first match wins ([model configuration](https://code.claude.com/docs/en/model-config)):
 
 | Order | Source |

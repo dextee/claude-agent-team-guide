@@ -12,7 +12,7 @@ repository-code: "https://github.com/dextee/claude-agent-team-guide"
 url: "https://github.com/dextee/claude-agent-team-guide"
 license: MIT
 version: 3.0.0
-date-released: 2026-11-15
+date-released: 2026-11-20
 keywords:
   - claude-code
   - claude

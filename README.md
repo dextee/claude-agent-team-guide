@@ -2,7 +2,7 @@
 
 # Claude Code Agent Team Guide
 
-### Run a team of Claude Code subagents you can trust.
+[Install version 3.0.0](SETUP.md#install-the-tagged-release) · [Try two named subagents](#try-two-named-subagents) · [Inspect verification](VALIDATION.md)
 
 How to split work across subagents, hand it off, run it in parallel without collisions, and prove the result, plus eight installable agents that pin the right model (Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5) and effort to each role.
 
@@ -21,13 +21,14 @@ Maintained by **[Dexter Ng](https://github.com/dextee), CTO & Cybersecurity Lead
 
 - **Default to one session.** Delegate when a subagent keeps noise out of the lead's context, runs independent work in parallel, or puts a cheaper model on checkable work. [When to delegate](docs/when-to-delegate.md).
 - **Subagents start in the background** and report through a completion notification in a later turn. Only their final message comes back. [How subagents run](docs/how-subagents-run.md).
-- **Brief in, evidence out.** Each subagent sees only its brief; each must return evidence, not a story. [Handoff contracts](docs/handoff-contracts.md).
+- **Brief in, evidence out.** Give each ordinary subagent the decisions and source paths it needs. Ask it to return evidence. [Handoff contracts](docs/handoff-contracts.md).
 - **Parallel writers get their own git worktree**, and the lead integrates. [Parallel work](docs/parallel-work-and-worktrees.md).
 - **The verifier is never the implementer**, never a fork, and gets the original brief. [Three-stage audit loop](docs/orchestration-patterns.md#pattern-5-three-stage-audit-loop).
 - **Start on Opus 5.5 at `medium`**, step down for checkable work, step up to Fable 5.2 on evidence. [Models and effort](docs/models-and-effort.md).
 
 ## Contents
 
+- [Try two named subagents](#try-two-named-subagents)
 - [Ten-minute path](#ten-minute-path)
 - [Six rules for a team you can trust](#six-rules-for-a-team-you-can-trust)
 - [The guide, chapter by chapter](#the-guide-chapter-by-chapter)
@@ -39,6 +40,34 @@ Maintained by **[Dexter Ng](https://github.com/dextee), CTO & Cybersecurity Lead
 - [Common questions](#common-questions)
 - [Part of the Agent Team Guide trilogy](#part-of-the-agent-team-guide-trilogy)
 - [Sources, artwork and maintenance](#sources-artwork-and-maintenance)
+
+## Try two named subagents
+
+Requires [Claude Code](https://code.claude.com/docs/en/overview) **v2.1.321 or later**. Check your version with `claude --version`.
+
+**1. Try the plugin in a fresh session.** From a terminal, clone this guide and load its agents for this session only:
+
+```bash
+git clone --branch v3.0.0 --depth 1 https://github.com/dextee/claude-agent-team-guide.git
+cd claude-agent-team-guide
+claude --plugin-dir .
+```
+
+**2. Give the agents different questions.** Paste this inside Claude Code:
+
+```text
+Use two subagents in parallel. Ask agent-team:explorer to read
+agents/explorer.md and quote its tools field. Ask agent-team:reviewer to
+read .github/workflows/validate.yml and quote its first run command.
+Use only those files. No edits, shell or web. Wait for both agents.
+Return each agent's name, file path and exact quote.
+```
+
+**3. Check the handoff.** Look for **two named delegations** in the session; a correct answer from the lead alone does not count. Use `/tasks` while they run to inspect their models. Then open [the explorer definition](agents/explorer.md) and [the workflow](.github/workflows/validate.yml). The returned lines should be `tools: Read, Glob, Grep` and `run: python3 scripts/validate.py`. If a name is missing, select the qualified role from the `@` picker and rerun its question. [Official subagent reference](https://code.claude.com/docs/en/sub-agents).
+
+![The lead splits a brief between an explorer finding allowed tools and a reviewer finding a CI command, then verifies both quotes.](docs/figures/first-handoff.svg)
+
+This is a delegation exercise; for two simple lookups in real work, one session usually suffices. For your own project, pick an [install option](#install-options) and try a [workflow recipe](docs/workflows.md).
 
 ## Ten-minute path
 
@@ -69,7 +98,7 @@ acceptance check yourself and show me the output.
 ## Six rules for a team you can trust
 
 1. **One owner per file.** Parallel writers get separate worktrees; shared files are done in sequence.
-2. **Fresh context per role.** A subagent sees only its brief. Put everything it needs in it.
+2. **Fresh context per role.** An ordinary subagent receives its role, brief and applicable project context. Include the decisions and acceptance checks it needs.
 3. **Brief in, evidence out.** Every report ends with status, evidence per claim and the real output of the checks it ran. [Return contract](templates/return-contract.md).
 4. **The verifier is not the implementer.** Reviewers and auditors are fresh subagents given the original requirements and the artifact, not a summary.
 5. **Escalate on evidence.** Raise effort, then the model, after a reproduced failure, conflicting evidence or a costly consequence.
@@ -105,8 +134,8 @@ acceptance check yourself and show me the output.
 | [implementer](agents/implementer.md) | `claude-opus-5-5` | medium | Full edit + Bash + web | Build the agreed change end to end, in your checkout, with tests |
 | [worker](agents/worker.md) | `claude-sonnet-5-5` | medium | Edit + Bash, own git worktree | Own one chunk; run several in parallel; commit and report the branch |
 | [explorer](agents/explorer.md) | `claude-haiku-5-5` | medium | Read, Glob, Grep | Find code fast and return paths with line numbers |
-| [reviewer](agents/reviewer.md) | `claude-sonnet-5-5` | high | Read + Bash, no edits | Routine independent review with evidence |
-| [auditor](agents/auditor.md) | `claude-fable-5-2` | high | Read + Bash, no edits | Demanding review; never relies on the implementer's account |
+| [reviewer](agents/reviewer.md) | `claude-sonnet-5-5` | high | Read + Bash, instructed to avoid edits | Routine independent review with evidence |
+| [auditor](agents/auditor.md) | `claude-fable-5-2` | high | Read + Bash, instructed to avoid edits | Demanding review; never relies on the implementer's account |
 | [researcher](agents/researcher.md) | `claude-sonnet-5-5` | high | Read-only + web | Gather current sources and flag uncertainty |
 | [editor](agents/editor.md) | `claude-sonnet-5-5` | medium | Edit, no Bash | Turn verified material into clear writing |
 
@@ -172,13 +201,13 @@ claude plugin marketplace add dextee/claude-agent-team-guide
 claude plugin install agent-team@dextee-guides
 ```
 
-Choose one method so you do not load two copies. To remove the installer's files, run `bash install.sh --uninstall`, or without a clone `curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall`. Files you edited are kept. To pin a version, use a commit SHA ([setup](SETUP.md#what-the-installer-does)). [Full setup, verification and rollback](SETUP.md).
+Choose one method so you do not load two copies. To remove the installer's files, run `bash install.sh --uninstall`, or without a clone `curl -fsSL https://raw.githubusercontent.com/dextee/claude-agent-team-guide/main/install.sh | bash -s -- --uninstall`. Files you edited are kept. Follow the [tagged release installation](SETUP.md#install-the-tagged-release) for a specific version. [Full setup, verification and rollback](SETUP.md).
 
 ## Cost and limits on one screen
 
 - Every subagent sends its own requests against the same plan or API budget. `/usage` attributes recent usage to subagents on subscription plans.
 - Results return into the lead's context. Ask for short, structured reports.
-- Defaults: three layers of nesting, 20 subagents running at once, no limit on the total. In the Agent SDK, cap spend with `max_budget_usd` / `maxBudgetUsd`.
+- Defaults: three layers of nesting, 20 subagents running at once, no limit on the total. In the Agent SDK, allow headroom for in-flight requests when setting the per-query threshold with `max_budget_usd` / `maxBudgetUsd`.
 - Subagent prompt caches last five minutes by default, even on a subscription.
 - Agent teams cost the most: each teammate is a full instance.
 - **Fable may bill usage credits on some plans.** Interactive sessions ask first. In non-interactive `claude -p` runs, Claude Code does not ask ([model configuration](https://code.claude.com/docs/en/model-config)).
@@ -210,7 +239,7 @@ One role spine (architect, implementer, worker, explorer, reviewer, auditor), ad
 | Guide | Models covered | Agent format |
 |---|---|---|
 | **Claude Code Agent Team Guide** (this repo) | Fable 5.2 · Opus 5.5 · Sonnet 5.5 · Haiku 5.5 | Markdown subagents with pinned model and effort |
-| [ChatGPT Agent Team Guide](https://github.com/dextee/chatgpt-agent-team-guide) | GPT-6 Astra · GPT-6.1 Sol · GPT-6 Luna | Codex TOML custom agents |
+| [ChatGPT Agent Team Guide](https://github.com/dextee/chatgpt-agent-team-guide) | GPT-6.2 Astra · GPT-6.2 Sol · GPT-6.1 Terra · GPT-6 Luna | Codex TOML custom agents |
 | [Kimi Agent Team Guide](https://github.com/dextee/kimi-agent-team-guide) | K3 · K3 256K · K2.8 Preview · K2.7 Code HighSpeed | Kimi Code Markdown agents and a model pool |
 
 Moving between them? [Role and lever mapping across the trilogy](docs/from-chatgpt-and-kimi.md). The three guides make no claim that models from different vendors are equivalent.

@@ -351,13 +351,13 @@ def check_min_version(texts: dict[str, str], version: str) -> list[str]:
 
 
 def check_raw_refs(text: str, label: str) -> list[str]:
-    """A download URL for this repository must name main or a full commit SHA. The repository
-    has no tags, so a tag ref would 404 (a v2.0.0 example did)."""
+    """Accept the current release tag, main and full commit pins in download examples."""
+    release_tag = "v" + json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))["version"]
     errors = []
     for ref in re.findall(rf'raw\.githubusercontent\.com/{re.escape(REPO)}/([^/\s"\'`)]+)/', text):
-        if ref == 'main' or re.fullmatch(r'[0-9a-f]{40}', ref) or ref in ('<commit-sha>', '${REF}', '$SHA', '${SHA}'):
+        if ref in ('main', release_tag) or re.fullmatch(r'[0-9a-f]{40}', ref) or ref in ('<commit-sha>', '${REF}', '$SHA', '${SHA}'):
             continue
-        errors.append(f'{label}: raw.githubusercontent.com ref "{ref}" is not main or a 40-character commit SHA')
+        errors.append(f'{label}: raw.githubusercontent.com ref "{ref}" must be main, the current release tag or a 40-character commit SHA')
     return errors
 
 

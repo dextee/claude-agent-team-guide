@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="392" viewBox="0 0 840 392" role="img" aria-labelledby="title desc">
+  <title id="title">Can the second agent start now?</title>
+  <desc id="desc">Run independent reads in parallel. If the reviewer needs a finished diff, let the builder finish before the review starts.</desc>
+  <rect width="840" height="392" rx="16" fill="#292d26"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#f8f0db">
+    <path d="M38 48h44" stroke="#e3a688" stroke-width="5"/>
+    <text x="96" y="53" font-size="16" font-weight="700" letter-spacing="2.5">FIELD NOTES / 02</text>
+    <text x="38" y="108" font-size="43" font-family="Georgia, serif">Can the second agent start now?</text>
+    <g stroke="#717267"><path d="M38 138h764M38 245h764M38 352h764"/></g>
+    <text x="38" y="181" font-size="24" font-weight="700" fill="#bcd4d9">Parallel</text>
+    <text x="38" y="213" font-size="19">Separate inputs</text>
+    <text x="38" y="289" font-size="24" font-weight="700" fill="#efb697">Sequential</text>
+    <text x="38" y="321" font-size="19">Shared dependency</text>
+    <g stroke="#dbcca6" fill="none" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M240 191h33l23-22h51m-74 22 23 22h51M547 169h47l23 22h50m-120 22h47l23-22"/>
+      <path d="M258 300h72m-8-7 8 7-8 7M477 300h67m-8-7 8 7-8 7M660 300h44m-8-7 8 7-8 7"/>
+    </g>
+    <g fill="#dbcca6"><circle cx="237" cy="191" r="5"/><circle cx="254" cy="300" r="5"/></g>
+    <text x="361" y="177" font-size="22">Read file A</text>
+    <text x="361" y="221" font-size="22">Read file B</text>
+    <text x="683" y="199" font-size="22">Compare</text>
+    <text x="348" y="308" font-size="22">Build diff</text>
+    <text x="559" y="308" font-size="22">Review</text>
+    <text x="717" y="308" font-size="22">Verify</text>
+  </g>
+</svg>

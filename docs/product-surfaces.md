@@ -59,9 +59,9 @@ options = ClaudeAgentOptions(
 )
 ```
 
-Pass `options` to `query()` with your prompt. Agents defined in code take precedence over files with the same name. Field reference: [AgentDefinition](https://code.claude.com/docs/en/agent-sdk/subagents). Python package `claude-agent-sdk`; TypeScript `@anthropic-ai/claude-agent-sdk`.
+Pass `options` to `query()` with your prompt. The role's `tools` list restricts that agent; the parent's `allowed_tools` list names tools approved without prompting, **not** the only tools the parent can use. [AgentDefinition](https://code.claude.com/docs/en/agent-sdk/subagents) · [Python options](https://code.claude.com/docs/en/agent-sdk/python). Python package `claude-agent-sdk`; TypeScript `@anthropic-ai/claude-agent-sdk`.
 
-Fable requests from the SDK can bill usage credits without a consent prompt on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config)). Set a spend cap with `max_budget_usd`, and depth and concurrency caps through the `env` option; see [cost and limits](cost-and-evaluation.md#built-in-limits-and-the-caps-you-can-set).
+Fable requests from SDK apps that do not show the consent prompt can bill usage credits on plans where Fable uses them ([model configuration](https://code.claude.com/docs/en/model-config#fable-and-usage-credits)). `max_budget_usd` is a **per-query stop threshold**, not a hard spending ceiling. Claude Code checks after a model response arrives. That response and work already in flight from parallel subagents can push the total past the threshold. Leave headroom. [SDK budget behavior](https://code.claude.com/docs/en/agent-sdk/agent-loop#budget-headroom)
 
 In the SDK, as in the CLI, only a subagent's final message returns to the parent, and the parent may summarize it. To pass a subagent's report through verbatim, say so in the prompt you give the main `query()` call ([Agent SDK subagents](https://code.claude.com/docs/en/agent-sdk/subagents)).
 
@@ -87,7 +87,7 @@ This is why the agent files pin full model IDs instead of aliases: an alias can 
 - **Non-interactive runs:** `claude -p "..."` runs one prompt and exits. Fable billing consent is not requested in this mode.
 - **Slack:** Claude Code can take tasks from Slack mentions ([overview](https://code.claude.com/docs/en/overview)).
 
-Project agents committed to the repository are available to any Claude Code run on that checkout.
+Check that the CI runner actually discovers the project agents before relying on a named delegation.
 
 ---
 

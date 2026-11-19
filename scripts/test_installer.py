@@ -41,6 +41,17 @@ class InstallerTests(unittest.TestCase):
         for name in files:
             self.assertEqual((folder / name).read_bytes(), (ROOT / 'agents' / name).read_bytes())
 
+    def test_replacing_a_linked_agent_preserves_the_other_copy(self):
+        agents = self.config / 'agents'
+        agents.mkdir(parents=True)
+        kept = self.base / 'my-role.md'
+        kept.write_bytes(b'My original role')
+        os.link(kept, agents / 'worker.md')
+        self.run_install()
+        self.assertEqual(kept.read_bytes(), b'My original role')
+        self.assertEqual((agents / 'worker.md').read_bytes(), (ROOT / 'agents/worker.md').read_bytes())
+        self.assertEqual(next(agents.glob('worker.md.bak-*')).read_bytes(), kept.read_bytes())
+
     def test_dry_run_writes_nothing(self):
         out = self.run_install('--dry-run', '--with-settings')
         self.assertIn('Dry run', out)
@@ -60,6 +71,7 @@ class InstallerTests(unittest.TestCase):
         existing = {'theme': 'dark', 'env': {'CUSTOM_FLAG': 'keep',
                                              'CLAUDE_CODE_SUBAGENT_MODEL': 'claude-haiku-5-5'}}
         self.write_settings(existing)
+        before = (self.config / 'settings.json').read_bytes()
         out = self.run_install('--with-settings')
         current = self.settings()
         self.assertEqual(current['theme'], 'dark')
@@ -67,8 +79,8 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual(current['env']['CLAUDE_CODE_SUBAGENT_MODEL'], 'claude-haiku-5-5')
         self.assertIn('kept', out)
         self.assertNotIn('$comment', current)
-        backup = next(self.config.glob('settings.json.bak-*'))
-        self.assertEqual(json.loads(backup.read_text(encoding='utf-8')), existing)
+        self.assertEqual((self.config / 'settings.json').read_bytes(), before)
+        self.assertFalse(list(self.config.glob('settings.json.bak-*')))
 
     def test_with_settings_on_fresh_config(self):
         self.run_install('--with-settings')
@@ -91,6 +103,94 @@ class InstallerTests(unittest.TestCase):
         out = self.run_install('--with-settings', expect=1)
         self.assertIn('not valid JSON', out)
         self.assertEqual((self.config / 'settings.json').read_text(encoding='utf-8'), '{not json')
+        self.assertEqual(list(self.config.iterdir()), [self.config / 'settings.json'])
+
+    def test_nonobject_settings_stop_before_creating_agents(self):
+        self.write_settings([])
+        self.run_install('--with-settings', expect=1)
+        self.assertEqual(list(self.config.iterdir()), [self.config / 'settings.json'])
+        self.assertEqual(self.settings(), [])
+
+    def test_requested_settings_without_python_fails_before_changes(self):
+        tools = self.base / 'tools'
+        tools.mkdir()
+        for name in ('bash', 'date', 'dirname', 'head', 'grep'):
+            (tools / name).symlink_to(Path('/usr/bin') / name)
+        out = self.run_install('--with-settings', path=str(tools), expect=1)
+        self.assertIn('requires python3', out)
+        self.assertFalse(self.config.exists())
+
+    def test_repeated_settings_merge_preserves_only_original_backup(self):
+        self.write_settings({'theme': 'keep'})
+        original = (self.config / 'settings.json').read_bytes()
+        self.run_install('--with-settings')
+        self.run_install('--with-settings')
+        backups = list(self.config.glob('settings.json.bak-*'))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), original)
+
+    def test_two_agent_backups_survive_the_same_timestamp(self):
+        tools = self.base / 'tools'
+        tools.mkdir()
+        clock = tools / 'date'
+        clock.write_text('#!/bin/sh\necho 20000101-000000\n')
+        clock.chmod(0o755)
+        agents = self.config / 'agents'
+        agents.mkdir(parents=True)
+        for text in ('first custom copy', 'second custom copy'):
+            (agents / 'worker.md').write_text(text)
+            self.run_install(path=f'{tools}:/usr/bin:/bin')
+        self.assertEqual(sorted(p.read_text() for p in agents.glob('worker.md.bak-*')),
+                         ['first custom copy', 'second custom copy'])
+
+    def test_identical_unowned_agent_survives_before_and_after_install(self):
+        agents = self.config / 'agents'
+        agents.mkdir(parents=True)
+        personal = agents / 'worker.md'
+        personal.write_bytes((ROOT / 'agents' / personal.name).read_bytes())
+        self.run_install('--uninstall')
+        self.assertTrue(personal.is_file())
+        self.run_install()
+        self.run_install()
+        self.run_install('--uninstall')
+        self.assertEqual(list(agents.iterdir()), [personal])
+
+    def test_offline_uninstall_uses_manifest_for_retired_role(self):
+        self.run_install()
+        agents = self.config / 'agents'
+        (agents / 'worker.md').rename(agents / 'archivist.md')
+        manifest = agents / '.agent-team-manifest'
+        manifest.write_text(manifest.read_text().replace('worker.md', 'archivist.md'))
+        # No adjacent source files and no network access.
+        standalone = self.base / 'uninstall.sh'
+        standalone.write_bytes((ROOT / 'install.sh').read_bytes())
+        tools = self.base / 'tools'
+        tools.mkdir()
+        curl = tools / 'curl'
+        curl.write_text('#!/bin/sh\nexit 1\n')
+        curl.chmod(0o755)
+        self.run_install('--uninstall', script=standalone, path=f'{tools}:/usr/bin:/bin')
+        self.assertEqual(list(agents.iterdir()), [])
+
+    def test_rejects_invalid_manifest_before_removing_owned_siblings(self):
+        self.run_install()
+        agents = self.config / 'agents'
+        manifest = agents / '.agent-team-manifest'
+        with manifest.open('a') as out:
+            out.write('0' * 64 + '  ../other.md\n')
+        self.run_install('--uninstall', expect=1)
+        self.check_agents(agents)
+
+    def test_manifest_symlink_is_refused_before_install_or_uninstall(self):
+        agents = self.config / 'agents'
+        agents.mkdir(parents=True)
+        outside = self.base / 'personal.txt'
+        outside.write_text('leave this alone')
+        (agents / '.agent-team-manifest').symlink_to(outside)
+        for args in ((), ('--uninstall',)):
+            self.run_install(*args, expect=1)
+        self.assertEqual(outside.read_text(), 'leave this alone')
+        self.assertFalse(list(agents.glob('*.md')))
 
     def test_project_install_backs_up_changed_agent(self):
         project = self.base / 'project with spaces'
