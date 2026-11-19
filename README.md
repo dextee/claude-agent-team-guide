@@ -250,7 +250,7 @@ The [Agent Workflow Atlas](docs/atlas/README.md) maps all 14 workflows on [VYR A
 
 ## Apply the approach with VYR
 
-This guide is free under the MIT license. VYR also scopes and builds agent workflows for businesses. Share the recurring task, current tools, monthly volume, budget range and target start date. **[See the process and send a workflow brief](WORK_WITH_VYR.md)** · [Current Agent OS status](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_business)
+This guide is free under the MIT license. If your team needs an agent built around an existing process, share the task, systems and volume. If you already run agents, Dexter can assess what their integrations are authorised to do. [Scope an AI workflow](WORK_WITH_VYR.md) · [See a sample security assessment](https://github.com/dextee/dextee/tree/main/security-review) · [Current Agent OS status](https://vyrwork.com/agent-os?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=guide_business)
 
 The recommendations are not evidence of VYR customer outcomes or an Anthropic endorsement of VYR.
 

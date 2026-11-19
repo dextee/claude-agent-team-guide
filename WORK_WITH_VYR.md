@@ -4,6 +4,8 @@
 
 This guide is maintained by **Dexter Ng, CTO & Cybersecurity Lead at VYR**. The guide is free to use under its MIT license. VYR also provides paid workflow scoping and implementation services. [Current team and company information](https://vyrwork.com/about?utm_source=github&utm_medium=referral&utm_campaign=claude_agent_guide&utm_content=vyr_about).
 
+If your agents already have access to business systems, Dexter also offers cybersecurity assessments. Start with one integration and the most consequential action it can take. [Read an example finding about approval rights](https://github.com/dextee/dextee/tree/main/security-review) · [Discuss a security assessment](https://www.linkedin.com/in/dexterng/)
+
 ## What would your team like to stop repeating?
 
 An agent team helps when a recurring task needs several kinds of work: reading a request, checking approved information, preparing an action and handling exceptions. Start with the business process and the result you need, not the model.
